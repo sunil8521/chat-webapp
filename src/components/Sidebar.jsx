@@ -197,18 +197,19 @@ export default function Sidebar() {
               <ListItemContent>
                 <Typography level="title-sm">Messages</Typography>
               </ListItemContent>
-              <Chip size="sm" color="primary" variant="solid">
-                4
-              </Chip>
+              
             </ListItemButton>
           </ListItem>
           <ListItem nested>
+
+
+
             <Toggler
               renderToggle={({ open, setOpen }) => (
                 <ListItemButton onClick={() => setOpen(!open)}>
                   <GroupRoundedIcon />
                   <ListItemContent>
-                    <Typography level="title-sm">Users</Typography>
+                    <Typography level="title-sm">Find users</Typography>
                   </ListItemContent>
                   <KeyboardArrowDownIcon
                     sx={{
@@ -218,6 +219,9 @@ export default function Sidebar() {
                 </ListItemButton>
               )}
             >
+
+
+
               <List sx={{ gap: 0.5 }}>
                 <ListItem sx={{ mt: 0.5 }}>
                   <ListItemButton role="menuitem" component="a" href="/joy-ui/getting-started/templates/profile-dashboard/">
@@ -231,9 +235,13 @@ export default function Sidebar() {
                   <ListItemButton>Roles & permission</ListItemButton>
                 </ListItem>
               </List>
+
+
             </Toggler>
           </ListItem>
         </List>
+
+        
         <List
           size="sm"
           sx={{
@@ -244,7 +252,7 @@ export default function Sidebar() {
             mb: 2,
           }}
         >
-          <ListItem>
+          {/* <ListItem>
             <ListItemButton>
               <SupportRoundedIcon />
               Support
@@ -255,9 +263,9 @@ export default function Sidebar() {
               <SettingsRoundedIcon />
               Settings
             </ListItemButton>
-          </ListItem>
+          </ListItem> */}
         </List>
-        <Card
+        {/* <Card
           invertedColors
           variant="soft"
           color="warning"
@@ -272,7 +280,7 @@ export default function Sidebar() {
             <Typography level="body-sm">50.5/100 GB</Typography>
           </Stack>
           <LinearProgress value={50.5} color="primary" variant="soft" />
-        </Card>
+        </Card> */}
         <ListItem>
           <ListItemButton sx={{ flexDirection: 'column' }}>
             <Avatar
@@ -287,6 +295,8 @@ export default function Sidebar() {
             </Button>
           </ListItemButton>
         </ListItem>
+
+
       </Box>
     </Sheet>
   );

@@ -1,24 +1,22 @@
-
 import { useContext } from "react";
-import {useGlobalVar} from "./context/ContextUse"
-import Box from '@mui/joy/Box';
-import Sidebar from '../components/Sidebar';
-import Header from '../components/Header';
-import MyMessages from '../components/MyMessages';
+import { useGlobalVar } from "./context/ContextUse";
+import HomePage from "./pages/HomePage";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import SignInPage from "./pages/SignInPage";
+import SignUpPage from "./pages/SignUpPage";
+
 function App() {
-  const {count,setCount}=useGlobalVar()
- 
+  const { count, setCount } = useGlobalVar();
 
   return (
     <>
-       <Box sx={{ display: 'flex', minHeight: '100dvh' }}>
-        <Sidebar />
-        <Header />
-        <Box component="main" className="MainContent" sx={{ flex: 1 }}>
-          <MyMessages />
-        </Box>
-      </Box>
-    
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/signup" element={<SignUpPage />} />
+          <Route path="/signin" element={<SignInPage />} />
+        </Routes>
+      </BrowserRouter>
     </>
   );
 }
