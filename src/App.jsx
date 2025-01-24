@@ -7,11 +7,28 @@ import SignInPage from "./pages/SignInPage";
 import SignUpPage from "./pages/SignUpPage";
 import LandingPage from "./pages/LandingPage";
 import { Global_var_provider } from "./context/context";
+import { useSelector,useDispatch } from "react-redux";
+import { useEffect } from "react";
+import {deleteUser,setUser} from "./redux/reducer/auth"
+import axios from "axios"
+import Loader from "./shared/Loader";
 
-const user=true
 function App() {
+  const { user,loading } = useSelector((state) => state.AUTH);
+  const dispatch = useDispatch();
 
-  return (
+ useEffect(() => {
+      axios
+        .get(`${import.meta.env.VITE_SERVERURL}/api/user/me`, { withCredentials: true })
+        .then(({ data }) => {
+          dispatch(setUser(data));
+        })
+        .catch((er) => {
+          dispatch(deleteUser());
+        });
+  }, [dispatch]);
+
+  return loading ?(<Loader/>): (
     <>
       <BrowserRouter>
         <Routes>

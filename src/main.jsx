@@ -5,9 +5,11 @@ import App from "./App.jsx";
 import { CssBaseline } from '@mui/joy';
 import { CssVarsProvider } from '@mui/joy/styles';
 import {Toaster} from "react-hot-toast"
+import {Provider} from "react-redux"
+import store from "./redux/store.js"
 createRoot(document.getElementById("root")).render(
   // <StrictMode>
-    <>
+    <Provider store={store}>
 
     {/* <Global_var_provider> */}
      <CssVarsProvider disableTransitionOnChange>
@@ -16,7 +18,7 @@ createRoot(document.getElementById("root")).render(
       <App />
     </CssVarsProvider>
     {/* </Global_var_provider> */}
-    </>
+    </Provider>
 
 
   // </StrictMode>

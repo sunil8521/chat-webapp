@@ -15,18 +15,29 @@ import {
 import { Link as RouterLink } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import toast from 'react-hot-toast';
-
+import axios from "axios"
+import { useDispatch } from "react-redux";
+import { setUser } from "../redux/reducer/auth";
 export default function SignInPage() {
 
-
+const dispatch=useDispatch()
   const {
     register,
     handleSubmit,
     formState: { isSubmitting, errors },
   } = useForm();
-  const onSubmit = (data) => {
-    console.log(data);
-  };
+
+  const onSubmit = async(data) => {
+    try{
+     const res= await axios.post(`${import.meta.env.VITE_SERVERURL}/api/user/signup`,data,{withCredentials:true})
+     const userData= await axios.get(`${import.meta.env.VITE_SERVERURL}/api/user/me`,{withCredentials:true})
+     dispatch(setUser(userData.data))
+     
+    }catch(er){
+     toast.error(er.response.data.message||"Something went wrong")
+ 
+    }
+   };
   return (
     <Box
       sx={{
@@ -70,7 +81,7 @@ export default function SignInPage() {
               type="text"
               fullWidth
               sx={{
-                
+                color:"white",
                 mt: 2,
                 bgcolor: "neutral.700",
                 borderColor: "neutral.600",
@@ -101,6 +112,7 @@ export default function SignInPage() {
               type="text"
               fullWidth
               sx={{
+                color:"white",
                 mt: 2,
                 bgcolor: "neutral.700",
                 borderColor: "neutral.600",
@@ -135,6 +147,7 @@ export default function SignInPage() {
               type="email"
               fullWidth
               sx={{
+                color:"white",
                 mt: 2,
                 bgcolor: "neutral.700",
                 borderColor: "neutral.600",
@@ -161,6 +174,7 @@ export default function SignInPage() {
               type="password"
               fullWidth
               sx={{
+                color:"white",
                 mt: 2,
                 bgcolor: "neutral.700",
                 borderColor: "neutral.600",

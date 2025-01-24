@@ -12,8 +12,12 @@ import {
 } from "@mui/joy";
 import { Link as RouterLink } from "react-router-dom";
 import { useForm } from "react-hook-form";
-
+import axios from "axios"
+import toast from "react-hot-toast"
+import { useDispatch } from "react-redux";
+import { setUser } from "../redux/reducer/auth";
 export default function SignInPage() {
+  const dispatch=useDispatch()
   const {
     register,
     handleSubmit,
@@ -21,8 +25,16 @@ export default function SignInPage() {
   } = useForm();
 
 
-  const onSubmit = (data) => {
-   console.log(data)
+  const onSubmit = async(data) => {
+   try{
+    const res= await axios.post(`${import.meta.env.VITE_SERVERURL}/api/user/signin`,data,{withCredentials:true})
+    const userData= await axios.get(`${import.meta.env.VITE_SERVERURL}/api/user/me`,{withCredentials:true})
+    dispatch(setUser(userData.data))
+    
+   }catch(er){
+    toast.error(er.response.data.message||"Something went wrong")
+
+   }
   };
   return (
     <Box
@@ -65,6 +77,7 @@ export default function SignInPage() {
               type="email"
               fullWidth
               sx={{
+                color:"white",
                 mb: 2,
                 bgcolor: "neutral.700",
                 borderColor: "neutral.600",
@@ -85,6 +98,7 @@ export default function SignInPage() {
               fullWidth
               sx={{
                 mb: 2,
+                color:"white",
                 bgcolor: "neutral.700",
                 borderColor: "neutral.600",
                 "&:hover": { borderColor: "neutral.500" },
