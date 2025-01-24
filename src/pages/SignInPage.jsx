@@ -69,6 +69,7 @@ export default function SignInPage() {
                 bgcolor: "neutral.700",
                 borderColor: "neutral.600",
                 "&:hover": { borderColor: "neutral.500" },
+                
               }}
               {...register("email", {
                 required: "Email is required",

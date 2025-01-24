@@ -59,9 +59,11 @@ export default function MessagesPane(props) {
           })}
         </Stack>
       </Box>
+
       <MessageInput
         textAreaValue={textAreaValue}
         setTextAreaValue={setTextAreaValue}
+
         onSubmit={() => {
           const newId = chatMessages.length + 1;
           const newIdString = newId.toString();
@@ -76,6 +78,8 @@ export default function MessagesPane(props) {
           ]);
         }}
       />
+
+      
     </Sheet>
   );
 }

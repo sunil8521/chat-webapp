@@ -1,4 +1,3 @@
-import * as React from 'react';
 import Box from '@mui/joy/Box';
 import Button from '@mui/joy/Button';
 import FormControl from '@mui/joy/FormControl';
@@ -10,31 +9,36 @@ import FormatItalicRoundedIcon from '@mui/icons-material/FormatItalicRounded';
 import StrikethroughSRoundedIcon from '@mui/icons-material/StrikethroughSRounded';
 import FormatListBulletedRoundedIcon from '@mui/icons-material/FormatListBulletedRounded';
 import SendRoundedIcon from '@mui/icons-material/SendRounded';
-
+import { useForm } from 'react-hook-form';
+import {useGlobalVar} from "../context/ContextUse"
 export default function MessageInput(props) {
-  const { textAreaValue, setTextAreaValue, onSubmit } = props;
-  const textAreaRef = React.useRef(null);
-
-  const handleClick = () => {
-    if (textAreaValue.trim() !== '') {
-      onSubmit();
-      setTextAreaValue('');
+  const {handleSubmit,register,reset,getValues,setValue}=useForm()
+const {ws}=useGlobalVar()
+  
+  const onSubmit=(data)=>{
+    const message={
+      type:"message",
+      content:data.message.trim()
     }
-  };
 
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ message }));
+      console.log("Message sent to server:", message);
+    }
+    reset()
+  }
+ 
   return (
     <Box sx={{ px: 2, pb: 3 }}>
+
+        <form onSubmit={handleSubmit(onSubmit)}>
       <FormControl>
         <Textarea
           placeholder="Type something here…"
           aria-label="Message"
-          ref={textAreaRef}
-          onChange={(event) => {
-            setTextAreaValue(event.target.value);
-          }}
-          value={textAreaValue}
           minRows={3}
           maxRows={10}
+          {...register("message",{required:true})}
           endDecorator={
             <Stack
               direction="row"
@@ -63,21 +67,16 @@ export default function MessageInput(props) {
                 </IconButton>
               </div>
               <Button
+              type="submit"
                 size="sm"
                 color="primary"
                 sx={{ alignSelf: 'center', borderRadius: 'sm' }}
                 endDecorator={<SendRoundedIcon />}
-                onClick={handleClick}
               >
                 Send
               </Button>
             </Stack>
           }
-          onKeyDown={(event) => {
-            if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
-              handleClick();
-            }
-          }}
           sx={{
             '& textarea:first-of-type': {
               minHeight: 72,
@@ -85,6 +84,7 @@ export default function MessageInput(props) {
           }}
         />
       </FormControl>
+      </form>
     </Box>
   );
 }

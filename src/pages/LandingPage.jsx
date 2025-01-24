@@ -1,80 +1,86 @@
-import * as React from 'react';
-import { Box, Button, Card, Typography, Stack, Sheet } from '@mui/joy';
-
-export default function LandingPage() {
+import React from "react";
+import { Box, Button, Typography,Link } from "@mui/joy";
+import {Link as RouterLink} from "react-router-dom"
+const LandingPage = () => {
   return (
-    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: 'neutral.100' }}>
-      {/* Header */}
-      <Sheet
-        component="header"
-        sx={{
-          p: 2,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          bgcolor: 'neutral.50',
-          boxShadow: 'sm',
-        }}
-      >
-        <Typography fontWeight="lg" level="h5">
-          Acme Co.
-        </Typography>
-        <Stack direction="row" spacing={2}>
-          <Button variant="soft">Home</Button>
-          <Button variant="soft">About</Button>
-          <Button variant="soft">Features</Button>
-        </Stack>
-      </Sheet>
-
-      {/* Main Content */}
+    <Box
+      sx={{
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        background: "linear-gradient(to bottom, #1a1a2e, #16213e)",
+        color: "#fff",
+        overflow: "hidden",
+      }}
+    >
+      {/* Background SVG */}
       <Box
         sx={{
-          flex: 1,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          px: 2,
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 0,
+          overflow: "hidden",
         }}
       >
-        <Card
-          variant="outlined"
-          sx={{
-            maxWidth: 600,
-            textAlign: 'center',
-            p: 4,
-            bgcolor: 'background.body',
-            boxShadow: 'lg',
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 800 400"
+          preserveAspectRatio="xMidYMid slice"
+          style={{
+            width: "100%",
+            height: "100%",
+            opacity: 0.2,
           }}
         >
-          <Typography level="h2" fontWeight="xl" mb={1}>
-            Welcome to Acme Co.
-          </Typography>
-          <Typography level="body-lg" mb={3}>
-            Join us to explore seamless communication with your team.
-          </Typography>
-          <Stack direction="row" spacing={2} justifyContent="center">
-            <Button variant="solid" color="primary" size="lg">
-              Login
-            </Button>
-            <Button variant="outlined" size="lg">
-              Sign Up
-            </Button>
-          </Stack>
-        </Card>
+          <path
+            d="M0 100 Q400 200 800 100 T1600 100"
+            fill="none"
+            stroke="#fff"
+            strokeWidth="200"
+          />
+        </svg>
       </Box>
 
-      {/* Footer */}
-      <Sheet
-        component="footer"
+      {/* Content */}
+      <Box
         sx={{
-          p: 2,
-          textAlign: 'center',
-          bgcolor: 'neutral.50',
-          boxShadow: 'sm',
+          zIndex: 1,
+          textAlign: "center",
         }}
       >
-        <Typography level="body-sm">© 2025 Acme Co. All rights reserved.</Typography>
-      </Sheet>
+        <Typography
+          level="h1"
+          sx={{
+            fontSize: { xs: "2.5rem", md: "4rem" },
+            fontWeight: "bold",
+            mb: 2,
+          }}
+        >
+          Welcome to Minimal Space
+        </Typography>
+        <Typography level="h6" sx={{ fontSize: "1.25rem", mb: 3 }}>
+          A clean and minimal place for your creativity.
+        </Typography>
+        <Link
+        component={RouterLink}
+        to={"/signin"}
+          variant="solid"
+          sx={{
+            p:1,
+            backgroundColor: "#4ecca3",
+            ":hover": { backgroundColor: "#3db589" },
+          }}
+        >
+          Get Started
+        </Link>
+      </Box>
     </Box>
   );
-}
+};
+
+export default LandingPage;
