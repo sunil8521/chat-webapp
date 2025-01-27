@@ -35,6 +35,7 @@ function App() {
           <Route element={<Auth user={user}/>}>
 
           <Route path="/chat" element={<Global_var_provider><HomePage /></Global_var_provider>} />
+          <Route path="/chat/:id" element={<Global_var_provider><h1>hello this is a page</h1></Global_var_provider>} />
           </Route>
 
 

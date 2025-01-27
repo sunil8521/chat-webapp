@@ -29,8 +29,12 @@ import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import BrightnessAutoRoundedIcon from '@mui/icons-material/BrightnessAutoRounded';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-
+import axios from "axios"
 import ColorSchemeToggle from './ColorSchemeToggle';
+import { Link } from 'react-router-dom';
+import {useDispatch, useSelector} from "react-redux"
+import toast from 'react-hot-toast';
+import {deleteUser} from "../redux/reducer/auth"
 // import { closeSidebar } from '../utils';
 
 function Toggler({ defaultExpanded = false, renderToggle, children }) {
@@ -55,6 +59,14 @@ function Toggler({ defaultExpanded = false, renderToggle, children }) {
 }
 
 export default function Sidebar() {
+  const { user,loading } = useSelector((state) => state.AUTH);
+  const dispatch=useDispatch()
+const handleLogout=async()=>{
+  await axios.get(`${import.meta.env.VITE_SERVERURL}/api/user/logout`,{withCredentials:true})
+  toast.success("Logout successfully")
+  dispatch(deleteUser())
+  
+}
   return (
     <Sheet
       className="Sidebar"
@@ -159,38 +171,12 @@ export default function Sidebar() {
               </ListItemContent>
             </ListItemButton>
           </ListItem>
-          <ListItem nested>
-            <Toggler
-              renderToggle={({ open, setOpen }) => (
-                <ListItemButton onClick={() => setOpen(!open)}>
-                  <AssignmentRoundedIcon />
-                  <ListItemContent>
-                    <Typography level="title-sm">Tasks</Typography>
-                  </ListItemContent>
-                  <KeyboardArrowDownIcon
-                    sx={{
-                      transform: open ? 'rotate(180deg)' : 'none',
-                    }}
-                  />
-                </ListItemButton>
-              )}
-            >
-              <List sx={{ gap: 0.5 }}>
-                <ListItem sx={{ mt: 0.5 }}>
-                  <ListItemButton>All tasks</ListItemButton>
-                </ListItem>
-                <ListItem>
-                  <ListItemButton>Backlog</ListItemButton>
-                </ListItem>
-                <ListItem>
-                  <ListItemButton>In progress</ListItemButton>
-                </ListItem>
-                <ListItem>
-                  <ListItemButton>Done</ListItemButton>
-                </ListItem>
-              </List>
-            </Toggler>
-          </ListItem>
+
+
+
+          
+
+
           <ListItem>
             <ListItemButton selected>
               <QuestionAnswerRoundedIcon />
@@ -224,16 +210,14 @@ export default function Sidebar() {
 
               <List sx={{ gap: 0.5 }}>
                 <ListItem sx={{ mt: 0.5 }}>
-                  <ListItemButton role="menuitem" component="a" href="/joy-ui/getting-started/templates/profile-dashboard/">
+                  <ListItemButton role="menuitem" component={Link} to="/profile">
                     My profile
                   </ListItemButton>
                 </ListItem>
                 <ListItem>
-                  <ListItemButton>Create a new user</ListItemButton>
+                  <ListItemButton>Find friends</ListItemButton>
                 </ListItem>
-                <ListItem>
-                  <ListItemButton>Roles & permission</ListItemButton>
-                </ListItem>
+               
               </List>
 
 
@@ -242,7 +226,7 @@ export default function Sidebar() {
         </List>
 
         
-        <List
+        {/* <List
           size="sm"
           sx={{
             mt: 'auto',
@@ -251,7 +235,7 @@ export default function Sidebar() {
             '--List-gap': '8px',
             mb: 2,
           }}
-        >
+        > */}
           {/* <ListItem>
             <ListItemButton>
               <SupportRoundedIcon />
@@ -264,7 +248,7 @@ export default function Sidebar() {
               Settings
             </ListItemButton>
           </ListItem> */}
-        </List>
+        {/* </List> */}
         {/* <Card
           invertedColors
           variant="soft"
@@ -281,20 +265,21 @@ export default function Sidebar() {
           </Stack>
           <LinearProgress value={50.5} color="primary" variant="soft" />
         </Card> */}
-        <ListItem>
-          <ListItemButton sx={{ flexDirection: 'column' }}>
-            <Avatar
-              sx={{ width: 40, height: 40, mb: 1 }}
-              src="https://mui.com/static/images/avatar/1.jpg"
-            />
-            <Typography fontWeight="lg">Emma</Typography>
-            <Typography level="body-sm">emma.miller@mui.com</Typography>
-            <Divider sx={{ my: 1 }} />
-            <Button color="danger" fullWidth variant="soft" startDecorator={<LogoutRoundedIcon />}>
-              Logout
-            </Button>
-          </ListItemButton>
-        </ListItem>
+         <Divider sx={{ my: 1 }} />
+         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+        <Avatar
+          variant="outlined"
+          size="sm"
+          src={user.avtar}
+        />
+        <Box sx={{ minWidth: 0, flex: 1 }}>
+          <Typography level="title-sm">{user.fullname}</Typography>
+          <Typography level="body-xs">{user.email}</Typography>
+        </Box>
+        <IconButton size="sm" variant="plain" color="neutral" onClick={handleLogout}>
+          <LogoutRoundedIcon  />
+        </IconButton>
+      </Box>
 
 
       </Box>

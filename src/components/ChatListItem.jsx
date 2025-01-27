@@ -1,67 +1,69 @@
-import React from 'react';
-import Box from '@mui/joy/Box';
-import ListDivider from '@mui/joy/ListDivider';
-import ListItem from '@mui/joy/ListItem';
-import ListItemButton from '@mui/joy/ListItemButton';
-import Stack from '@mui/joy/Stack';
-import Typography from '@mui/joy/Typography';
-import CircleIcon from '@mui/icons-material/Circle';
-import AvatarWithStatus from './AvatarWithStatus';
-
-export default function ChatListItem({
-  id,
-  sender,
-  messages,
-  selectedChatId,
-  setSelectedChat,
-}) {
-  const selected = selectedChatId === id;
+import React from "react";
+import Box from "@mui/joy/Box";
+import ListDivider from "@mui/joy/ListDivider";
+import ListItem from "@mui/joy/ListItem";
+import ListItemButton from "@mui/joy/ListItemButton";
+import Stack from "@mui/joy/Stack";
+import Typography from "@mui/joy/Typography";
+import CircleIcon from "@mui/icons-material/Circle";
+import AvatarWithStatus from "./AvatarWithStatus";
+import Skeleton from '@mui/joy/Skeleton';
+import { Link } from "react-router-dom";
+export default function ChatListItem({participants}) {
 
   return (
     <>
+
       <ListItem>
         <ListItemButton
+        component={Link}
+        to={`/chat/${participants._id}`}
           onClick={() => {
             // toggleMessagesPane();
-            setSelectedChat({ id, sender, messages });
+            // setSelectedChat({ id, sender, messages });
           }}
-          selected={selected}
+          selected={false}
           color="neutral"
-          sx={{ flexDirection: 'column', alignItems: 'initial', gap: 1 }}
+          sx={{ flexDirection: "column", alignItems: "initial", gap: 1 }}
         >
           <Stack direction="row" spacing={1.5}>
-            <AvatarWithStatus online={sender.online} src={sender.avatar} />
+            <AvatarWithStatus online={false} src={participants.avtar} />
             <Box sx={{ flex: 1 }}>
-              <Typography level="title-sm">{sender.name}</Typography>
-              <Typography level="body-sm">{sender.username}</Typography>
+              <Typography level="title-sm">{participants.fullname}</Typography>
+              <Typography level="body-sm">@{participants.username}</Typography>
             </Box>
-            <Box sx={{ lineHeight: 1.5, textAlign: 'right' }}>
-              {messages[0].unread && (
+            <Box sx={{ lineHeight: 1.5, textAlign: "right" }}>
+              {/* {messages[0].unread && (
                 <CircleIcon sx={{ fontSize: 12 }} color="primary" />
-              )}
+              )} */}
               <Typography
                 level="body-xs"
                 noWrap
-                sx={{ display: { xs: 'none', md: 'block' } }}
+                sx={{ display: { xs: "none", md: "block" } }}
               >
                 5 mins ago
               </Typography>
             </Box>
           </Stack>
+
           <Typography
             level="body-sm"
             sx={{
-              display: '-webkit-box',
-              WebkitLineClamp: '2',
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
+              display: "-webkit-box",
+              WebkitLineClamp: "2",
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
             }}
           >
-            {messages[0].content}
+            {"This message is last message from user"}
           </Typography>
+
+
         </ListItemButton>
       </ListItem>
+
+
       <ListDivider sx={{ margin: 0 }} />
     </>
   );

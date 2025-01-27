@@ -8,10 +8,12 @@ import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import ChatListItem from './ChatListItem';
+import Skeleton from '@mui/joy/Skeleton';
 // import { toggleMessagesPane } from '../utils';
 
 export default function ChatsPane(props) {
-  const { chats, setSelectedChat, selectedChatId } = props;
+  const { chats, isLoading, isError } = props;
+
   return (
     <Sheet
       sx={{
@@ -72,6 +74,22 @@ export default function ChatsPane(props) {
           aria-label="Search"
         />
       </Box>
+      {isError ? (
+          <Typography
+            color="danger"
+            sx={{
+              height:"80dvh",
+              display:"flex",
+              justifyContent:"center",
+              alignItems:"center",
+              fontSize: '1rem',
+            }}
+          >
+            Unable to fetch chats.
+          </Typography>
+        ):
+      
+        <Skeleton loading={isLoading}>
       <List
         sx={{
           py: 0,
@@ -79,15 +97,21 @@ export default function ChatsPane(props) {
           '--ListItem-paddingX': '1rem',
         }}
       >
-        {chats.map((chat) => (
+
+        {chats?.map((chat,index) => (
           <ChatListItem
-            key={chat.id}
+            key={index}
             {...chat}
-            setSelectedChat={setSelectedChat}
-            selectedChatId={selectedChatId}
-          />
+            // setSelectedChat={setSelectedChat}
+            // selectedChatId={selectedChatId}
+            />
         ))}
       </List>
+      </Skeleton>
+      }
+
+    
+
     </Sheet>
   );
 }
