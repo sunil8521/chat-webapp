@@ -35,7 +35,7 @@ import { Link } from 'react-router-dom';
 import {useDispatch, useSelector} from "react-redux"
 import toast from 'react-hot-toast';
 import {deleteUser} from "../redux/reducer/auth"
-// import { closeSidebar } from '../utils';
+import { closeSidebar } from '../../utils';
 
 function Toggler({ defaultExpanded = false, renderToggle, children }) {
   const [open, setOpen] = React.useState(defaultExpanded);
@@ -117,7 +117,7 @@ const handleLogout=async()=>{
             lg: 'translateX(-100%)',
           },
         }}
-        // onClick={() => closeSidebar()}
+        onClick={() => closeSidebar()}
       />
       <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
         <IconButton variant="soft" color="primary" size="sm">
@@ -126,7 +126,7 @@ const handleLogout=async()=>{
         <Typography level="title-lg">Acme Co.</Typography>
         <ColorSchemeToggle sx={{ ml: 'auto' }} />
       </Box>
-      <Input size="sm" startDecorator={<SearchRoundedIcon />} placeholder="Search" />
+      {/* <Input size="sm" startDecorator={<SearchRoundedIcon />} placeholder="Search" /> */}
       <Box
         sx={{
           minHeight: 0,
@@ -148,29 +148,30 @@ const handleLogout=async()=>{
           }}
         >
           <ListItem>
-            <ListItemButton>
+            <ListItemButton selected component={Link} to='/chat'>
               <HomeRoundedIcon />
-              <ListItemContent>
+              <ListItemContent >
                 <Typography level="title-sm">Home</Typography>
               </ListItemContent>
             </ListItemButton>
           </ListItem>
-          <ListItem>
+          {/* <ListItem>
             <ListItemButton>
               <DashboardRoundedIcon />
               <ListItemContent>
                 <Typography level="title-sm">Dashboard</Typography>
               </ListItemContent>
             </ListItemButton>
-          </ListItem>
-          <ListItem>
+          </ListItem> */}
+
+          {/* <ListItem>
             <ListItemButton role="menuitem" component="a" href="/joy-ui/getting-started/templates/order-dashboard/">
               <ShoppingCartRoundedIcon />
               <ListItemContent>
                 <Typography level="title-sm">Orders</Typography>
               </ListItemContent>
             </ListItemButton>
-          </ListItem>
+          </ListItem> */}
 
 
 
@@ -178,7 +179,7 @@ const handleLogout=async()=>{
 
 
           <ListItem>
-            <ListItemButton selected>
+            <ListItemButton >
               <QuestionAnswerRoundedIcon />
               <ListItemContent>
                 <Typography level="title-sm">Messages</Typography>
@@ -265,6 +266,8 @@ const handleLogout=async()=>{
           </Stack>
           <LinearProgress value={50.5} color="primary" variant="soft" />
         </Card> */}
+
+        
          <Divider sx={{ my: 1 }} />
          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
         <Avatar

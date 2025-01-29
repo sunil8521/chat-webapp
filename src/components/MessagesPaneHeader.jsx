@@ -9,10 +9,11 @@ import CircleIcon from '@mui/icons-material/Circle';
 import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded';
 import PhoneInTalkRoundedIcon from '@mui/icons-material/PhoneInTalkRounded';
 import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
-// import { toggleMessagesPane } from '../utils';
+import { toggleMessagesPane } from '../../utils';
 
-export default function MessagesPaneHeader(props) {
-  const { sender } = props;
+export default function MessagesPaneHeader({sender}) {
+
+  const online=false
   return (
     <Stack
       direction="row"
@@ -35,17 +36,17 @@ export default function MessagesPaneHeader(props) {
           color="neutral"
           size="sm"
           sx={{ display: { xs: 'inline-flex', sm: 'none' } }}
-        //   onClick={() => toggleMessagesPane()}
+          onClick={() => toggleMessagesPane()}
         >
           <ArrowBackIosNewRoundedIcon />
         </IconButton>
-        <Avatar size="lg" src={sender.avatar} />
+        <Avatar size="lg" src={sender?.avtar} />
         <div>
           <Typography
             component="h2"
             noWrap
             endDecorator={
-              sender.online ? (
+              online ? (
                 <Chip
                   variant="outlined"
                   size="sm"
@@ -62,9 +63,9 @@ export default function MessagesPaneHeader(props) {
             }
             sx={{ fontWeight: 'lg', fontSize: 'lg' }}
           >
-            {sender.name}
+            {sender?.fullname}
           </Typography>
-          <Typography level="body-sm">{sender.username}</Typography>
+          <Typography level="body-sm">@{sender?.username}</Typography>
         </div>
       </Stack>
       <Stack spacing={1} direction="row" sx={{ alignItems: 'center' }}>

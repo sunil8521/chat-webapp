@@ -9,7 +9,7 @@ import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import ChatListItem from './ChatListItem';
 import Skeleton from '@mui/joy/Skeleton';
-// import { toggleMessagesPane } from '../utils';
+import { toggleMessagesPane } from '../../utils';
 
 export default function ChatsPane(props) {
   const { chats, isLoading, isError } = props;
@@ -59,7 +59,7 @@ export default function ChatsPane(props) {
           color="neutral"
           size="sm"
           onClick={() => {
-            // toggleMessagesPane();
+            toggleMessagesPane();
           }}
           sx={{ display: { sm: 'none' } }}
         >

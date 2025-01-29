@@ -9,20 +9,27 @@ import CircleIcon from "@mui/icons-material/Circle";
 import AvatarWithStatus from "./AvatarWithStatus";
 import Skeleton from '@mui/joy/Skeleton';
 import { Link } from "react-router-dom";
-export default function ChatListItem({participants}) {
+import {toggleMessagesPane} from "../../utils"
+import { useParams } from "react-router-dom";
+export default function ChatListItem(chat) {
+  const {participants}=chat
+  const { id } = useParams();
+
+
+
+
 
   return (
     <>
-
       <ListItem>
         <ListItemButton
         component={Link}
-        to={`/chat/${participants._id}`}
+        to={`/chat/${chat._id}`}
           onClick={() => {
-            // toggleMessagesPane();
+            toggleMessagesPane();
             // setSelectedChat({ id, sender, messages });
           }}
-          selected={false}
+          selected={id==participants?._id}
           color="neutral"
           sx={{ flexDirection: "column", alignItems: "initial", gap: 1 }}
         >

@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Typography, Stack } from "@mui/joy";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
-
+import LayoutPage from "./LayoutPage";
 const WelcomeMessage = () => {
   return (
     <Box
@@ -27,4 +27,5 @@ const WelcomeMessage = () => {
   );
 };
 
-export default WelcomeMessage;
+const WelcomeMessageWithLayout=LayoutPage(WelcomeMessage)
+export default WelcomeMessageWithLayout;

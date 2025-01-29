@@ -32,7 +32,7 @@ export default function SignInPage() {
     dispatch(setUser(userData.data))
     
    }catch(er){
-    toast.error(er.response.data.message||"Something went wrong")
+    toast.error(er.response?.data?.message||"Something went wrong")
 
    }
   };
