@@ -22,14 +22,18 @@ const MessagesPane = () => {
   const [textAreaValue, setTextAreaValue] = React.useState("");
   const { data, error, isLoading } = useChatMembersQuery(id);
 
+const members=data?.members?.participants.map(({_id})=>_id)
+
+
 
   const sender=data?.members?.participants.find(({_id})=>_id.toString()!==user._id.toString())
-  // console.log(sender)
 
-
-
-
-
+  const payload={
+    chatid:id,
+    members,
+    sender:user._id
+  }
+  
 
   React.useEffect(() => {
     setChatMessages(chat.messages);
@@ -86,21 +90,8 @@ const MessagesPane = () => {
       </Box>
 
       <MessageInput
-        textAreaValue={textAreaValue}
-        setTextAreaValue={setTextAreaValue}
-        onSubmit={() => {
-          const newId = chatMessages.length + 1;
-          const newIdString = newId.toString();
-          setChatMessages([
-            ...chatMessages,
-            {
-              id: newIdString,
-              sender: "You",
-              content: textAreaValue,
-              timestamp: "Just now",
-            },
-          ]);
-        }}
+       payload={payload}
+       
       />
     </Sheet>
   );

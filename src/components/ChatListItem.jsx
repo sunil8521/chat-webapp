@@ -29,7 +29,7 @@ export default function ChatListItem(chat) {
             toggleMessagesPane();
             // setSelectedChat({ id, sender, messages });
           }}
-          selected={id==participants?._id}
+          selected={id==chat?._id}
           color="neutral"
           sx={{ flexDirection: "column", alignItems: "initial", gap: 1 }}
         >

@@ -14,7 +14,6 @@ import { chats } from "../../data";
 
 function LayoutPage(WrappedComponent) {
   const WithLayout = (props) => {
-    const [selectedChat, setSelectedChat] = useState(chats[0]);
     const { data, isError, isLoading, error, refetch } = useMyAllchatQuery("");
 
     return (
