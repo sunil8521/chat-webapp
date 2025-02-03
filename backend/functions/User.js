@@ -118,11 +118,15 @@ export const findMyMessages=errorHandler(async(req,res,next)=>{
   const skip = (page - 1) * limit; 
   
 
-  const allMessages=await messageModel.find({chatid:chatId}).populate({
+  let allMessages=await messageModel.find({chatid:chatId}).populate({
     path: "senderid",
     model: userModel,
     // select: "content updatedAt",
-  }).sort({createdAt:-1}).limit(limit).skip(skip); 
+  }).sort({createdAt:-1}).limit(limit).skip(skip).lean(); 
+
+  allMessages=allMessages.reverse()
+
+
   const totalMessages = await messageModel.countDocuments({ chatid: chatId });
   const totalPages = Math.ceil(totalMessages / limit);
 

@@ -1,6 +1,7 @@
-import { useEffect, useState,useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import Box from "@mui/joy/Box";
 import Sheet from "@mui/joy/Sheet";
+import CircularProgress from "@mui/joy/CircularProgress";
 import Stack from "@mui/joy/Stack";
 import { useParams } from "react-router-dom";
 
@@ -34,19 +35,24 @@ const MessagesPane = () => {
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   //----------------------
-  const messagesContainerRef=useRef(null)
-  console.log(messagesContainerRef)
+  const messagesContainerRef = useRef(null);
+  const endOfMessagesRef = useRef(null);
+
   const {
     data: messageData,
     error: messageError,
     isLoading: messageIsLoading,
-  } = useChatMessagesQuery(id);
+    refetch,
+  } = useChatMessagesQuery({ id, page }); //to fetch message
 
   const [chatMessages, setChatMessages] = useState([]);
-  useEffect(() => {
-    setChatMessages(messageData?.allMessages);
-  }, [messageData?.allMessages]);
+  const [databaseChatMessages, setDatabaseChatMessages] = useState([]);
 
+  useEffect(() => {
+    // setChatMessages(messageData?.allMessages);
+    setDatabaseChatMessages(messageData?.allMessages);
+  }, [messageData?.allMessages]);
+console.log(databaseChatMessages)
   useEffect(() => {
     if (!ws) return;
     const handleMessage = (event) => {
@@ -59,11 +65,11 @@ const MessagesPane = () => {
       }
     };
 
-     ws.addEventListener('message', handleMessage);
+    ws.addEventListener("message", handleMessage);
 
-        return () => {
-            ws.removeEventListener('message', handleMessage);
-        };
+    return () => {
+      ws.removeEventListener("message", handleMessage);
+    };
   }, [ws, id]);
 
   useEffect(() => {
@@ -71,8 +77,9 @@ const MessagesPane = () => {
 
     const handleScroll = () => {
       if (container.scrollTop === 0 && hasMore && !isLoadingMore) {
-        // fetchOlderMessages();
         console.log("more")
+        setIsLoadingMore(true);
+        // setPage((prev) => prev + 1);
       }
     };
 
@@ -84,6 +91,15 @@ const MessagesPane = () => {
   }, [hasMore, isLoadingMore]);
 
 
+  
+  useEffect(() => {
+    console.log("hello")
+    if (endOfMessagesRef.current) {
+      endOfMessagesRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [chatMessages]);
+
+  // const allMessages=[...databaseChatMessages,...chatMessages]
 
   return (
     <Sheet
@@ -96,7 +112,7 @@ const MessagesPane = () => {
     >
       <MessagesPaneHeader sender={sender} />
       <Box
-      ref={messagesContainerRef}
+        ref={messagesContainerRef}
         sx={{
           display: "flex",
           flex: 1,
@@ -104,15 +120,20 @@ const MessagesPane = () => {
           px: 2,
           py: 3,
           overflowY: "scroll",
-          flexDirection: "column-reverse",
+          flexDirection: "column",
         }}
       >
         <Stack spacing={2} sx={{ justifyContent: "flex-end" }}>
+          {isLoadingMore && (
+            <Box sx={{ display: "flex", justifyContent: "center" }}>
+              <CircularProgress variant="soft" />
+            </Box>
+          )}
           {messageIsLoading ? (
-            <Loader />
+            <CircularProgress variant="soft" />
           ) : (
             <>
-              {chatMessages?.map((message, index) => {
+              {databaseChatMessages?.map((message, index) => {
                 const isYou =
                   message.senderid._id.toString() === user._id.toString();
                 return (
@@ -132,6 +153,7 @@ const MessagesPane = () => {
             </>
           )}
         </Stack>
+        <div ref={endOfMessagesRef} />
       </Box>
 
       <MessageInput payload={payload} />

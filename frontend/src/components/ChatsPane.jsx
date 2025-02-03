@@ -23,7 +23,6 @@ export default function ChatsPane(props) {
     const handleMessage = (event) => {
     const newMessage = JSON.parse(event.data);
     if (newMessage.type === "last_message") {
-      console.log("listing for last")
       setLastMessage((prevMessages) => ({
         ...prevMessages,
         [newMessage.chatid]: newMessage, 
