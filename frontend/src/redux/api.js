@@ -18,7 +18,8 @@ import {createApi,fetchBaseQuery} from "@reduxjs/toolkit/query/react"
             query:(id)=>({url:`/api/user/members/${id}`})
           }),
           chatMessages:builder.query({
-            query:({id,page})=>({url:`/api/user/messages/${id}?page=${page}`})
+            query:({id,page})=>({url:`/api/user/messages/${id}?page=${page}`}),
+            keepUnusedDataFor: 0,
           })
 
     })

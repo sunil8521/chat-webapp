@@ -15,14 +15,13 @@ import { chats } from "../../data";
 function LayoutPage(WrappedComponent) {
   const WithLayout = (props) => {
     const { data, isError, isLoading, error, refetch } = useMyAllchatQuery("");
-
     return (
       <Box sx={{ display: "flex", minHeight: "100dvh" }}>
         <Sidebar />
         <Header />
 
+        {/* this will show all the chats and messages */}
         <Box component="main" className="MainContent" sx={{ flex: 1 }}>
-          {/* this will show all the chats and messages */}
           <Sheet
             sx={{
               flex: 1,
@@ -45,20 +44,17 @@ function LayoutPage(WrappedComponent) {
                 },
                 transition: "transform 0.4s, width 0.4s",
                 zIndex: 100,
-                width: "100%",
+                width: { xs: "45%", sm: "100%" },
                 top: 52,
+                height: "calc(100dvh - var(--Header-height))",
               }}
             >
               <ChatsPane
                 chats={data?.matchedChats}
                 isLoading={isLoading}
                 isError={isError}
-              
               />
             </Sheet>
-            {/* <MessagesPane chat={selectedChat} /> */}
-
-            {/* <WelcomeMessage /> */}
             <WrappedComponent {...props} />
           </Sheet>
         </Box>

@@ -1,10 +1,9 @@
 import userModel from "../schema/User.js";
 import requestModel from "../schema/Request.js";
 import { CustomError, errorHandler } from "../error/error.js";
-import { tokenProvider ,cookieOption} from "../helpers/TokenProvider.js";
-import chatModel from "../schema/Chat.js"
+import { tokenProvider, cookieOption } from "../helpers/TokenProvider.js";
+import chatModel from "../schema/Chat.js";
 import messageModel from "../schema/Message.js";
-
 
 export const signUp = errorHandler(async (req, res, next) => {
   const newUser = await userModel.create(req.body);
@@ -30,9 +29,11 @@ export const getMe = (req, res, next) => {
   res.json(req.user);
 };
 
-export const logout=(req,res,next)=>{
-  res.cookie("token","", { ...cookieOption, maAgee: 0 }).json({success:true,message:"Logout successfully"})
-}
+export const logout = (req, res, next) => {
+  res
+    .cookie("token", "", { ...cookieOption, maAgee: 0 })
+    .json({ success: true, message: "Logout successfully" });
+};
 
 export const sendRequest = errorHandler(async (req, res, next) => {
   const { touserid } = req.body;
@@ -63,24 +64,26 @@ export const handleRequest = errorHandler(async (req, res, next) => {
   if (!request) {
     return next(new CustomError("Request not found.", 404));
   }
-  if(status==="accept"){
-    await chatModel.create({participants:[request.fromuserid,request.touserid]})
-    await requestModel.findByIdAndDelete(requestid)
+  if (status === "accept") {
+    await chatModel.create({
+      participants: [request.fromuserid, request.touserid],
+    });
+    await requestModel.findByIdAndDelete(requestid);
     return res.status(200).json({
       success: true,
       message: "Friend request accepted. Chat created.",
-    });  } 
-  
-  if(status==="reject"){
-    await requestModel.findByIdAndDelete(requestid)
+    });
+  }
+
+  if (status === "reject") {
+    await requestModel.findByIdAndDelete(requestid);
 
     return res.status(200).json({
       success: true,
       message: "Friend request rejected.",
-    });  }
-
+    });
+  }
 });
-
 
 export const findFriends = errorHandler(async (req, res, next) => {
   const yourUserId = req.user._id;
@@ -91,65 +94,71 @@ export const findFriends = errorHandler(async (req, res, next) => {
       path: "participants",
       model: userModel,
       select: "fullname avtar username",
-    }).populate({
+    })
+    .populate({
       path: "lastmessage",
       model: messageModel,
       select: "content updatedAt",
-    })
+    });
 
-  matchedChats = matchedChats.map(({ _id, participants,lastmessage }) => {
+  matchedChats = matchedChats.map(({ _id, participants, lastmessage }) => {
     // Find the participant whose ID is not equal to your user ID
 
-    participants = participants.find(({ _id }) => _id.toString() !== yourUserId.toString());
+    participants = participants.find(
+      ({ _id }) => _id.toString() !== yourUserId.toString()
+    );
     return {
       _id,
       participants,
-      lastmessage
+      lastmessage,
     };
   });
 
   res.status(200).json({ success: true, matchedChats });
 });
 
-export const findMyMessages=errorHandler(async(req,res,next)=>{
-  const {chatId}=req.params
-  const page = parseInt(req.query.page) || 1; 
-  const limit = parseInt(req.query.limit) || 10; 
-  const skip = (page - 1) * limit; 
-  
+export const findMyMessages = errorHandler(async (req, res, next) => {
+  const { chatId } = req.params;
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
 
-  let allMessages=await messageModel.find({chatid:chatId}).populate({
-    path: "senderid",
-    model: userModel,
-    // select: "content updatedAt",
-  }).sort({createdAt:-1}).limit(limit).skip(skip).lean(); 
+  let allMessages = await messageModel
+    .find({ chatid: chatId })
+    .populate({
+      path: "senderid",
+      model: userModel,
+      // select: "content updatedAt",
+    })
+    .sort({ createdAt: -1 })
+    .limit(limit)
+    .skip(skip)
+    .lean();
 
-  allMessages=allMessages.reverse()
-
+  allMessages = allMessages.reverse();
 
   const totalMessages = await messageModel.countDocuments({ chatid: chatId });
   const totalPages = Math.ceil(totalMessages / limit);
+  res.status(200).json({
+    success: true,
+    allMessages,
+    pagination: {
+      currentPage: page,
+      totalPages,
+      totalMessages,
+      limit,
+    },
+  });
+});
 
-
-  res.status(200).json({success:true,allMessages, pagination: {
-    currentPage: page,
-    totalPages,
-    totalMessages,
-    limit,
-  },})
-
-})
-
-export const getMembers=errorHandler(async(req,res,next)=>{
-  const {chatId}=req.params
-  const myId=req.user._id
-  const members=await chatModel.findById(chatId).populate({
+export const getMembers = errorHandler(async (req, res, next) => {
+  const { chatId } = req.params;
+  const myId = req.user._id;
+  const members = await chatModel.findById(chatId).populate({
     path: "participants",
     model: userModel,
     select: "fullname avtar username",
   });
 
-  res.status(200).json({success:true,members})
-
-})
-
+  res.status(200).json({ success: true, members });
+});
