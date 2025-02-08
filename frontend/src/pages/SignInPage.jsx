@@ -1,20 +1,19 @@
-import * as React from "react";
 import {
   Box,
-  Sheet,
-  Typography,
-  FormControl,
-  FormHelperText,
-  Input,
   Button,
   Divider,
+  FormControl,
+  Input,
   Link,
+  Sheet,
+  Typography
 } from "@mui/joy";
-import { Link as RouterLink } from "react-router-dom";
+import axios from "axios";
+import * as React from "react";
 import { useForm } from "react-hook-form";
-import axios from "axios"
-import toast from "react-hot-toast"
+import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
+import { Link as RouterLink } from "react-router-dom";
 import { setUser } from "../redux/reducer/auth";
 export default function SignInPage() {
   const dispatch=useDispatch()
@@ -32,7 +31,8 @@ export default function SignInPage() {
     dispatch(setUser(userData.data))
     
    }catch(er){
-    toast.error(er.response?.data?.message||"Something went wrong")
+    console.log(er)
+    toast.error(er?.response?.data?.message||"Something went wrong")
 
    }
   };

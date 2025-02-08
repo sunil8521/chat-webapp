@@ -11,13 +11,14 @@ createRoot(document.getElementById("root")).render(
   // <StrictMode>
     <Provider store={store}>
 
-    {/* <Global_var_provider> */}
      <CssVarsProvider disableTransitionOnChange>
       <CssBaseline/>
       <Toaster  position="top-right"/>
+
+
       <App />
+
     </CssVarsProvider>
-    {/* </Global_var_provider> */}
     </Provider>
 
 

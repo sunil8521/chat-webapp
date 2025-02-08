@@ -1,12 +1,7 @@
-import { lazy,Suspense } from "react";
+import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Auth from "./Auth";
 
-const SignInPage = lazy(() => import("./pages/SignInPage"));
-const SignUpPage = lazy(() => import("./pages/SignUpPage"));
-const LandingPage = lazy(() => import("./pages/LandingPage"));
-const WelcomeMessageWithLayout = lazy(() => import("./pages/WelcomeMessage"));
-const MessagesPaneWithLayout = lazy(() => import("./pages/MessagesPane"));
 
 
 import { Global_var_provider } from "./context/context";
@@ -15,7 +10,7 @@ import { useEffect } from "react";
 import { deleteUser, setUser } from "./redux/reducer/auth";
 import axios from "axios";
 import Loader from "./shared/Loader";
-
+import { routes } from "./routes/routes";
 function App() {
   const { user, loading } = useSelector((state) => state.AUTH);
   const dispatch = useDispatch();
@@ -37,13 +32,42 @@ function App() {
   ) : (
     <>
       <BrowserRouter>
-      <Suspense fallback={<Loader/>}>
-        <Routes>
+        <Suspense fallback={<Loader />}>
+          <Routes>
+            {routes.map((route, index) => (
+              <Route
+                key={index}
+                path={route.path}
+                element={
+                  route.authRequired ? (
+                    <Auth user={user}>
+                      <Global_var_provider>{route.element}</Global_var_provider>
+                    </Auth>
+                  ) : (
+                    <Auth user={!user} redirect="/home">
+                      {route.element}
+                    </Auth>
+                  )
+                }
+              />
+            ))}
+            <Route path="*" element={<Navigate to={"/"} />} />
+          </Routes>
+        </Suspense>
+      </BrowserRouter>
+    </>
+  );
+}
 
-          <Route element={<Auth user={user} />}>
+export default App;
+
+
+
+
+            {/* <Route element={<Auth user={user} />}>
           
             <Route
-              path="/chat"
+              path="/home"
               element={
                 <Global_var_provider>
                   <WelcomeMessageWithLayout />
@@ -63,7 +87,7 @@ function App() {
           <Route
             path="/"
             element={
-              <Auth user={!user} redirect="/chat">
+              <Auth user={!user} redirect="/home">
                 <LandingPage />
               </Auth>
             }
@@ -71,7 +95,7 @@ function App() {
           <Route
             path="/signup"
             element={
-              <Auth user={!user} redirect="/chat">
+              <Auth user={!user} redirect="/home">
                 <SignUpPage />
               </Auth>
             }
@@ -79,20 +103,8 @@ function App() {
           <Route
             path="/signin"
             element={
-              <Auth user={!user} redirect="/chat">
+              <Auth user={!user} redirect="/home">
                 <SignInPage />
               </Auth>
             }
-          />
-          <Route path="*" element={<Navigate to={"/"} />} />
-
-
-
-        </Routes>
-        </Suspense>
-      </BrowserRouter>
-    </>
-  );
-}
-
-export default App;
+          /> */}

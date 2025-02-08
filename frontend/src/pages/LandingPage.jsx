@@ -1,85 +1,107 @@
-import React from "react";
-import { Box, Button, Typography,Link } from "@mui/joy";
-import {Link as RouterLink} from "react-router-dom"
+import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
+import Box from '@mui/joy/Box';
+import Container from '@mui/joy/Container';
+import Link from '@mui/joy/Link';
+import List from '@mui/joy/List';
+import ListItem from '@mui/joy/ListItem';
+import ListItemDecorator from '@mui/joy/ListItemDecorator';
+import { CssVarsProvider } from '@mui/joy/styles';
+import Typography from '@mui/joy/Typography';
+import React from 'react';
+import { Link as RouterLink } from "react-router-dom";
+
 const LandingPage = () => {
   return (
-    <Box
-      sx={{
-        minHeight: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        background: "linear-gradient(to bottom, #1a1a2e, #16213e)",
-        color: "#fff",
-        overflow: "hidden",
-      }}
-    >
-      {/* Background SVG */}
-      <Box
+    <CssVarsProvider>
+      <Container
         sx={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          zIndex: 0,
-          overflow: "hidden",
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: '100vh',
+          textAlign: 'center',
+          gap: 4,
+          padding: 4,
         }}
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 800 400"
-          preserveAspectRatio="xMidYMid slice"
-          style={{
-            width: "100%",
-            height: "100%",
-            opacity: 0.2,
-          }}
-        >
-          <path
-            d="M0 100 Q400 200 800 100 T1600 100"
-            fill="none"
-            stroke="#fff"
-            strokeWidth="200"
-          />
-        </svg>
-      </Box>
+        {/* Heading */}
+        <Typography level="h1" sx={{ fontSize: '3rem', fontWeight: 'bold', color: 'primary.500' }}>
+          Welcome to ChatApp
+        </Typography>
 
-      {/* Content */}
-      <Box
-        sx={{
-          zIndex: 1,
-          textAlign: "center",
-        }}
-      >
-        <Typography
-          level="h1"
-          sx={{
-            fontSize: { xs: "2.5rem", md: "4rem" },
-            fontWeight: "bold",
-            mb: 2,
-          }}
-        >
-          Welcome to Minimal Space
+        {/* Subheading */}
+        <Typography level="h4" sx={{ color: 'text.secondary' }}>
+          Connect with friends, family, and colleagues seamlessly.
         </Typography>
-        <Typography level="h6" sx={{ fontSize: "1.25rem", mb: 3 }}>
-          A clean and minimal place for your creativity.
-        </Typography>
+
+        {/* Get Started Button */}
         <Link
         component={RouterLink}
         to={"/signin"}
           variant="solid"
           sx={{
             p:1,
-            backgroundColor: "#4ecca3",
-            ":hover": { backgroundColor: "#3db589" },
+            // textDecoration:"None",
+            backgroundColor: 'primary.500',
+            color: 'white',
+            '&:hover': { backgroundColor: 'primary.600' },
           }}
         >
           Get Started
         </Link>
-      </Box>
-    </Box>
+
+        {/* Features List */}
+        <Box
+          sx={{
+            maxWidth: '600px',
+            width: '100%',
+            marginTop: 4,
+          }}
+        >
+          <Typography level="h5" sx={{ marginBottom: 2, color: 'text.primary' }}>
+            Why Choose ChatApp?
+          </Typography>
+          <List
+            sx={{
+              gap: 2,
+              '--ListItemDecorator-size': '32px',
+            }}
+          >
+            <ListItem>
+              <ListItemDecorator>
+                <CheckCircleRoundedIcon sx={{ color: 'success.500' }} />
+              </ListItemDecorator>
+              <Typography>Real-time messaging with end-to-end encryption.</Typography>
+            </ListItem>
+            <ListItem>
+              <ListItemDecorator>
+                <CheckCircleRoundedIcon sx={{ color: 'success.500' }} />
+              </ListItemDecorator>
+              <Typography>Group chats for seamless collaboration.</Typography>
+            </ListItem>
+            <ListItem>
+              <ListItemDecorator>
+                <CheckCircleRoundedIcon sx={{ color: 'success.500' }} />
+              </ListItemDecorator>
+              <Typography>Customizable themes for a personalized experience.</Typography>
+            </ListItem>
+            <ListItem>
+              <ListItemDecorator>
+                <CheckCircleRoundedIcon sx={{ color: 'success.500' }} />
+              </ListItemDecorator>
+              <Typography>File sharing and media support.</Typography>
+            </ListItem>
+            <ListItem>
+              <ListItemDecorator>
+                <CheckCircleRoundedIcon sx={{ color: 'success.500' }} />
+              </ListItemDecorator>
+              <Typography>Cross-platform compatibility (Web, Mobile, Desktop).</Typography>
+            </ListItem>
+          </List>
+        </Box>
+      </Container>
+    </CssVarsProvider>
   );
 };
 

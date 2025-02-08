@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Typography, Stack } from "@mui/joy";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
-import LayoutPage from "./LayoutPage";
+import MessageLayouts from "../../components/Layouts/MessageLayout";
 const WelcomeMessage = () => {
   return (
     <Box
@@ -9,7 +9,7 @@ const WelcomeMessage = () => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        height: { xs: 'calc(100dvh - var(--Header-height))', md: '100dvh' },
+        height: { xs: "calc(100dvh - var(--Header-height))", md: "100dvh" },
         textAlign: "center",
         backgroundColor: "background.level1",
       }}
@@ -27,5 +27,5 @@ const WelcomeMessage = () => {
   );
 };
 
-const WelcomeMessageWithLayout=LayoutPage(WelcomeMessage)
+const WelcomeMessageWithLayout = MessageLayouts(WelcomeMessage);
 export default WelcomeMessageWithLayout;

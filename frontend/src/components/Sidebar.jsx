@@ -25,7 +25,6 @@ import QuestionAnswerRoundedIcon from "@mui/icons-material/QuestionAnswerRounded
 import GroupRoundedIcon from "@mui/icons-material/GroupRounded";
 import SupportRoundedIcon from "@mui/icons-material/SupportRounded";
 import SettingsRoundedIcon from "@mui/icons-material/SettingsRounded";
-import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import { CheckRounded, CloseRounded } from "@mui/icons-material";
 import SearchRounded from "@mui/icons-material/SearchRounded";
 import PersonAddRounded from "@mui/icons-material/PersonAddRounded";
@@ -43,9 +42,12 @@ import { closeSidebar, toggleMessagesPane } from "../../utils";
 import Modal from "@mui/joy/Modal";
 import ModalClose from "@mui/joy/ModalClose";
 import { toggleFindFriendsModal,toggleNotofocationModal } from "../redux/reducer/modal";
+import { routes } from '../routes/routes';
 
 export default function Sidebar() {
   const { user, loading } = useSelector((state) => state.AUTH);
+  const sidebarRoutes = routes.filter((route) => route.sidebar);
+
   const dispatch = useDispatch();
   const handleLogout = async () => {
     await axios.get(`${import.meta.env.VITE_SERVERURL}/api/user/logout`, {
@@ -56,7 +58,6 @@ export default function Sidebar() {
   };
   const { findFriends,notifications } = useSelector((state) => state.MODAL);
   const [searchTerm, setSearchTerm] = useState("");
-  // const [debouncedTerm, setDebouncedTerm] = useState("");
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -121,6 +122,7 @@ export default function Sidebar() {
         }}
         onClick={() => closeSidebar()}
       />
+
       <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
         <IconButton variant="soft" color="primary" size="sm">
           <BrightnessAutoRoundedIcon />
@@ -128,6 +130,8 @@ export default function Sidebar() {
         <Typography level="title-lg">hul chat</Typography>
         <ColorSchemeToggle sx={{ ml: "auto" }} />
       </Box>
+
+
       <Box
         onClick={() => closeSidebar()}
         sx={{
@@ -166,6 +170,8 @@ export default function Sidebar() {
               </ListItemContent>
             </ListItemButton>
           </ListItem>
+          
+
           <ListItem>
             <ListItemButton onClick={() => dispatch(toggleFindFriendsModal())}>
               <GroupRoundedIcon />
@@ -174,6 +180,7 @@ export default function Sidebar() {
               </ListItemContent>
             </ListItemButton>
           </ListItem>
+
           <ListItem>
             <ListItemButton onClick={() => dispatch(toggleNotofocationModal())}>
               <GroupRoundedIcon />
@@ -370,6 +377,7 @@ export default function Sidebar() {
           </Box>
         </Sheet>
       </Modal>
+
     </Sheet>
   );
 }

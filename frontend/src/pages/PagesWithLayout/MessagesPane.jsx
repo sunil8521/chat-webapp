@@ -5,13 +5,13 @@ import CircularProgress from "@mui/joy/CircularProgress";
 import Stack from "@mui/joy/Stack";
 import { useParams } from "react-router-dom";
 
-import LayoutPage from "./LayoutPage";
-import ChatBubble from "../components/ChatBubble";
-import MessageInput from "../components/MessageInput";
-import MessagesPaneHeader from "../components/MessagesPaneHeader";
+import ChatBubble from "../../components/ChatBubble";
+import MessageInput from "../../components/MessageInput";
+import MessagesPaneHeader from "../../components/MessagesPaneHeader";
 import { useSelector } from "react-redux";
-import { useChatMembersQuery, useChatMessagesQuery } from "../redux/api";
-import { useGlobalVar } from "../context/ContextUse";
+import { useChatMembersQuery, useChatMessagesQuery } from "../../redux/api";
+import { useGlobalVar } from "../../context/ContextUse";
+import MessageLayouts from "../../components/Layouts/MessageLayout";
 
 const MessagesPane = () => {
   const { ws } = useGlobalVar();
@@ -40,7 +40,7 @@ const MessagesPane = () => {
     data: messageData,
     error: messageError,
     isLoading: messageIsLoading,
-    isFetching:messageIsFetching
+    isFetching: messageIsFetching,
   } = useChatMessagesQuery({ id, page });
 
   // Messages state
@@ -73,8 +73,6 @@ const MessagesPane = () => {
       prevScrollTop = messagesContainerRef.current.scrollTop;
     }
 
-
-
     if (!messageData?.allMessages) return;
     if (page === 1) {
       setDatabaseChatMessages(messageData.allMessages);
@@ -92,14 +90,13 @@ const MessagesPane = () => {
     }
     setIsLoadingMore(false);
 
-
-
-
     requestAnimationFrame(() => {
       if (messagesContainerRef.current) {
         const newScrollTop =
-          prevScrollTop + messagesContainerRef.current.scrollHeight - prevScrollHeight;
-          messagesContainerRef.current.scrollTop = newScrollTop;
+          prevScrollTop +
+          messagesContainerRef.current.scrollHeight -
+          prevScrollHeight;
+        messagesContainerRef.current.scrollTop = newScrollTop;
       }
     });
   }, [messageData, page]);
@@ -135,9 +132,9 @@ const MessagesPane = () => {
 
       const { scrollTop } = messagesContainerRef.current;
 
-      if (scrollTop <= 100*page) {
+      if (scrollTop <= 100 * page) {
         setPage((prev) => {
-          console.log('enter and chnge page ')
+          console.log("enter and chnge page ");
           const nextPage = prev + 1;
           //TODO: page change automatically
           if (nextPage > messageData?.messageData?.totalPages) {
@@ -147,12 +144,9 @@ const MessagesPane = () => {
           setIsLoadingMore(true);
           return nextPage;
         });
-
       }
     }, 200);
-
-
-  }, [hasMore, isLoadingMore, messageData?.messageData?.totalPages,page]);
+  }, [hasMore, isLoadingMore, messageData?.messageData?.totalPages, page]);
 
   useEffect(() => {
     const container = messagesContainerRef.current;
@@ -229,5 +223,5 @@ const MessagesPane = () => {
   );
 };
 
-const MessagesPaneWithLayout = LayoutPage(MessagesPane);
+const MessagesPaneWithLayout = MessageLayouts(MessagesPane);
 export default MessagesPaneWithLayout;

@@ -5,6 +5,9 @@ import Typography from '@mui/joy/Typography';
 import { Box, Chip, IconButton, Input } from '@mui/joy';
 import List from '@mui/joy/List';
 import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
+import NotificationsRounded from "@mui/icons-material/NotificationsRounded";
+import Badge from "@mui/joy/Badge";
+
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import ChatListItem from './ChatListItem';
@@ -56,20 +59,21 @@ export default function ChatsPane(props) {
       >
         <Typography
           component="h1"
-          endDecorator={
-            <Chip
-              variant="soft"
-              color="primary"
-              size="md"
-              slotProps={{ root: { component: 'span' } }}
-            >
-              4
-            </Chip>
-          }
+          // endDecorator={
+          //   <Chip
+          //     variant="soft"
+          //     color="primary"
+          //     size="md"
+          //     slotProps={{ root: { component: 'span' } }}
+          //   >
+          //     4
+          //   </Chip>
+          // }
           sx={{ fontSize: { xs: 'md', md: 'lg' }, fontWeight: 'lg', mr: 'auto' }}
         >
           Messages
         </Typography>
+        <Badge badgeContent={3} color="primary" variant="soft">
         <IconButton
           variant="plain"
           aria-label="edit"
@@ -77,8 +81,9 @@ export default function ChatsPane(props) {
           size="sm"
           sx={{ display: { xs: 'none', sm: 'unset' } }}
         >
-          <EditNoteRoundedIcon />
+          <NotificationsRounded />
         </IconButton>
+        </Badge>
         <IconButton
           variant="plain"
           aria-label="edit"

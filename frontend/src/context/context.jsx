@@ -14,7 +14,7 @@ export const Global_var_provider = ({ children }) => {
 
     if (!user._id) return;
 
-    let socket = new WebSocket("ws://127.0.0.1:8080", [user._id]);
+    let socket = new WebSocket(import.meta.env.VITE_WSURL, [user._id]);
 
     socket.onopen = () => {
       console.log("WebSocket connection established");
