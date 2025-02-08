@@ -32,7 +32,7 @@ export const routes = [
     path: "/chat/:id",
     element: <MessagesPaneWithLayout />,
     authRequired: true,
-    sidebar: { label: "Messages", icon: <QuestionAnswerRoundedIcon /> },
+    sidebar: { label: "Chats", icon: <QuestionAnswerRoundedIcon /> },
   },
   {
     path: "/profile",

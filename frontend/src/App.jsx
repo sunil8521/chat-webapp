@@ -11,6 +11,19 @@ import { deleteUser, setUser } from "./redux/reducer/auth";
 import axios from "axios";
 import Loader from "./shared/Loader";
 import { routes } from "./routes/routes";
+const SignInPage = lazy(() => import("./pages/SignInPage"));
+const SignUpPage = lazy(() => import("./pages/SignUpPage"));
+const LandingPage = lazy(() => import("./pages/LandingPage"));
+const WelcomeMessageWithLayout = lazy(() =>
+  import("./pages/PagesWithLayout/WelcomeMessage")
+);
+const MessagesPaneWithLayout = lazy(() =>
+  import("./pages/PagesWithLayout/MessagesPane")
+);
+const MyProfile = lazy(() => import("./pages/PagesWithLayout/Profile"));
+
+
+
 function App() {
   const { user, loading } = useSelector((state) => state.AUTH);
   const dispatch = useDispatch();
@@ -52,6 +65,8 @@ function App() {
               />
             ))}
             <Route path="*" element={<Navigate to={"/"} />} />
+ 
+
           </Routes>
         </Suspense>
       </BrowserRouter>
@@ -64,7 +79,7 @@ export default App;
 
 
 
-            {/* <Route element={<Auth user={user} />}>
+ {/* <Route element={<Auth user={user} />}>
           
             <Route
               path="/home"
@@ -82,9 +97,17 @@ export default App;
                 </Global_var_provider>
               }
             />
-          </Route>
+            <Route
+              path="/profile"
+              element={
+                <Global_var_provider>
+                  <MyProfile />
+                </Global_var_provider>
+              }
+            />
+          </Route> */}
 
-          <Route
+          {/* <Route
             path="/"
             element={
               <Auth user={!user} redirect="/home">

@@ -1,50 +1,40 @@
-import { useState, useEffect } from "react";
-import GlobalStyles from "@mui/joy/GlobalStyles";
+import { CheckRounded, CloseRounded } from "@mui/icons-material";
+import BrightnessAutoRoundedIcon from "@mui/icons-material/BrightnessAutoRounded";
+import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
+import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
+import Person from "@mui/icons-material/Person";
+import PersonAddRounded from "@mui/icons-material/PersonAddRounded";
+import QuestionAnswerRoundedIcon from "@mui/icons-material/QuestionAnswerRounded";
+import SearchRounded from "@mui/icons-material/SearchRounded";
 import Avatar from "@mui/joy/Avatar";
 import Box from "@mui/joy/Box";
 import Button from "@mui/joy/Button";
-import Card from "@mui/joy/Card";
-import Chip from "@mui/joy/Chip";
 import Divider from "@mui/joy/Divider";
+import GlobalStyles from "@mui/joy/GlobalStyles";
 import IconButton from "@mui/joy/IconButton";
 import Input from "@mui/joy/Input";
-import LinearProgress from "@mui/joy/LinearProgress";
 import List from "@mui/joy/List";
 import ListItem from "@mui/joy/ListItem";
 import ListItemButton, { listItemButtonClasses } from "@mui/joy/ListItemButton";
 import ListItemContent from "@mui/joy/ListItemContent";
-import Typography from "@mui/joy/Typography";
-import Sheet from "@mui/joy/Sheet";
-import Stack from "@mui/joy/Stack";
-import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
-import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
-import DashboardRoundedIcon from "@mui/icons-material/DashboardRounded";
-import ShoppingCartRoundedIcon from "@mui/icons-material/ShoppingCartRounded";
-import AssignmentRoundedIcon from "@mui/icons-material/AssignmentRounded";
-import QuestionAnswerRoundedIcon from "@mui/icons-material/QuestionAnswerRounded";
-import GroupRoundedIcon from "@mui/icons-material/GroupRounded";
-import SupportRoundedIcon from "@mui/icons-material/SupportRounded";
-import SettingsRoundedIcon from "@mui/icons-material/SettingsRounded";
-import { CheckRounded, CloseRounded } from "@mui/icons-material";
-import SearchRounded from "@mui/icons-material/SearchRounded";
-import PersonAddRounded from "@mui/icons-material/PersonAddRounded";
-import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
-import BrightnessAutoRoundedIcon from "@mui/icons-material/BrightnessAutoRounded";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import Person from "@mui/icons-material/Person";
-import axios from "axios";
-import ColorSchemeToggle from "./ColorSchemeToggle";
-import { Link } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import toast from "react-hot-toast";
-import { deleteUser } from "../redux/reducer/auth";
-import { closeSidebar, toggleMessagesPane } from "../../utils";
 import Modal from "@mui/joy/Modal";
 import ModalClose from "@mui/joy/ModalClose";
-import { toggleFindFriendsModal,toggleNotofocationModal } from "../redux/reducer/modal";
+import Sheet from "@mui/joy/Sheet";
+import Typography from "@mui/joy/Typography";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { closeSidebar, toggleMessagesPane } from "../../utils";
+import { deleteUser } from "../redux/reducer/auth";
+import { toggleFindFriendsModal, toggleNotofocationModal } from "../redux/reducer/modal";
 import { routes } from '../routes/routes';
+import ColorSchemeToggle from "./ColorSchemeToggle";
+import { useLocation } from "react-router-dom";
 
 export default function Sidebar() {
+  const location=useLocation()
   const { user, loading } = useSelector((state) => state.AUTH);
   const sidebarRoutes = routes.filter((route) => route.sidebar);
 
@@ -65,7 +55,6 @@ export default function Sidebar() {
     }, 1000);
 
     return () => {
-      console.log("return");
       clearTimeout(timer);
     };
   }, [searchTerm]);
@@ -154,7 +143,7 @@ export default function Sidebar() {
           }}
         >
           <ListItem>
-            <ListItemButton selected component={Link} to="/chat">
+            <ListItemButton selected={location.pathname.includes("home")} component={Link} to="/home">
               <HomeRoundedIcon />
               <ListItemContent>
                 <Typography level="title-sm">Home</Typography>
@@ -162,7 +151,7 @@ export default function Sidebar() {
             </ListItemButton>
           </ListItem>
 
-          <ListItem>
+          <ListItem sx={{display:{xs:"unset",sm:"none"}}}>
             <ListItemButton onClick={() => toggleMessagesPane()}>
               <QuestionAnswerRoundedIcon />
               <ListItemContent>
@@ -170,9 +159,16 @@ export default function Sidebar() {
               </ListItemContent>
             </ListItemButton>
           </ListItem>
-          
+          <ListItem >
+            <ListItemButton selected={location.pathname.includes("profile")} role="menuitem" component={Link} to="/profile">
+              <Person />
+              <ListItemContent>
+                <Typography level="title-sm">My profile</Typography>
+              </ListItemContent>
+            </ListItemButton>
+          </ListItem>
 
-          <ListItem>
+          {/* <ListItem>
             <ListItemButton onClick={() => dispatch(toggleFindFriendsModal())}>
               <GroupRoundedIcon />
               <ListItemContent>
@@ -188,17 +184,7 @@ export default function Sidebar() {
                 <Typography level="title-sm">Notifications</Typography>
               </ListItemContent>
             </ListItemButton>
-          </ListItem>
-
-
-          <ListItem>
-            <ListItemButton role="menuitem" component={Link} to="/profile">
-              <Person />
-              <ListItemContent>
-                <Typography level="title-sm">My profile</Typography>
-              </ListItemContent>
-            </ListItemButton>
-          </ListItem>
+          </ListItem> */}
         </List>
 
         {/* to user profile */}

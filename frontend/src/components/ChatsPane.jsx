@@ -1,61 +1,62 @@
-import {useEffect, useState} from 'react';
-import Stack from '@mui/joy/Stack';
-import Sheet from '@mui/joy/Sheet';
-import Typography from '@mui/joy/Typography';
-import { Box, Chip, IconButton, Input } from '@mui/joy';
-import List from '@mui/joy/List';
-import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
+import { useEffect, useState } from "react";
+import Stack from "@mui/joy/Stack";
+import Sheet from "@mui/joy/Sheet";
+import Typography from "@mui/joy/Typography";
+import { Box, Chip, IconButton, Input } from "@mui/joy";
+import List from "@mui/joy/List";
+import EditNoteRoundedIcon from "@mui/icons-material/EditNoteRounded";
 import NotificationsRounded from "@mui/icons-material/NotificationsRounded";
 import Badge from "@mui/joy/Badge";
 
-import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
-import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
-import ChatListItem from './ChatListItem';
-import Skeleton from '@mui/joy/Skeleton';
-import { toggleMessagesPane } from '../../utils';
+import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
+import ChatListItem from "./ChatListItem";
+import Skeleton from "@mui/joy/Skeleton";
+import { toggleMessagesPane } from "../../utils";
 import { useGlobalVar } from "../context/ContextUse";
+import SearchUserAndNotification from "../shared/SearchUserAndNotification";
 
 export default function ChatsPane(props) {
   const { ws } = useGlobalVar();
   const [lastMessage, setLastMessage] = useState({});
   const { chats, isLoading, isError } = props;
-  
 
-  useEffect(()=>{
-    if(!ws) return
+  useEffect(() => {
+    if (!ws) return;
     const handleMessage = (event) => {
-    const newMessage = JSON.parse(event.data);
-    if (newMessage.type === "last_message") {
-      setLastMessage((prevMessages) => ({
-        ...prevMessages,
-        [newMessage.chatid]: newMessage, 
-      }));
-    }
+      const newMessage = JSON.parse(event.data);
+      if (newMessage.type === "last_message") {
+        setLastMessage((prevMessages) => ({
+          ...prevMessages,
+          [newMessage.chatid]: newMessage,
+        }));
+      }
+    };
+    ws.addEventListener("message", handleMessage);
 
-  
-  };  
-  ws.addEventListener('message', handleMessage);
-
-  return () => {
-      ws.removeEventListener('message', handleMessage);
-  };
-},[ws])
+    return () => {
+      ws.removeEventListener("message", handleMessage);
+    };
+  }, [ws]);
 
   return (
     <Sheet
       sx={{
-        borderRight: '1px solid',
-        borderColor: 'divider',
-        height: { sm: 'calc(100dvh - var(--Header-height))', md: '100dvh' },
-        overflowY: 'auto',
+        borderRight: "1px solid",
+        borderColor: "divider",
+        height: { sm: "calc(100dvh - var(--Header-height))", md: "100dvh" },
+        overflowY: "auto",
       }}
     >
-
-      
       <Stack
         direction="row"
         spacing={1}
-        sx={{ alignItems: 'center', justifyContent: 'space-between', p: 2, pb: 1.5 }}
+        sx={{
+          alignItems: "center",
+          justifyContent: "space-between",
+          p: 2,
+          pb: 1.5,
+        }}
       >
         <Typography
           component="h1"
@@ -69,21 +70,19 @@ export default function ChatsPane(props) {
           //     4
           //   </Chip>
           // }
-          sx={{ fontSize: { xs: 'md', md: 'lg' }, fontWeight: 'lg', mr: 'auto' }}
+          sx={{
+            fontSize: { xs: "md", md: "lg" },
+            fontWeight: "lg",
+            mr: "auto",
+          }}
         >
           Messages
         </Typography>
-        <Badge badgeContent={3} color="primary" variant="soft">
-        <IconButton
-          variant="plain"
-          aria-label="edit"
-          color="neutral"
-          size="sm"
-          sx={{ display: { xs: 'none', sm: 'unset' } }}
-        >
-          <NotificationsRounded />
-        </IconButton>
-        </Badge>
+
+
+
+        <SearchUserAndNotification  display={{xs:"none",sm:"flex"}}/>
+
         <IconButton
           variant="plain"
           aria-label="edit"
@@ -92,7 +91,7 @@ export default function ChatsPane(props) {
           onClick={() => {
             toggleMessagesPane();
           }}
-          sx={{ display: { sm: 'none' } }}
+          sx={{ display: { sm: "none" } }}
         >
           <CloseRoundedIcon />
         </IconButton>
@@ -106,46 +105,38 @@ export default function ChatsPane(props) {
         />
       </Box>
       {isError ? (
-          <Typography
-            color="danger"
+        <Typography
+          color="danger"
+          sx={{
+            height: "80dvh",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            fontSize: "1rem",
+          }}
+        >
+          Unable to fetch chats.
+        </Typography>
+      ) : (
+        <Skeleton loading={isLoading}>
+          <List
             sx={{
-              height:"80dvh",
-              display:"flex",
-              justifyContent:"center",
-              alignItems:"center",
-              fontSize: '1rem',
+              py: 0,
+              "--ListItem-paddingY": "0.75rem",
+              "--ListItem-paddingX": "1rem",
             }}
           >
-            Unable to fetch chats.
-          </Typography>
-        ):
-      
-        <Skeleton loading={isLoading}>
-      <List
-        sx={{
-          py: 0,
-          '--ListItem-paddingY': '0.75rem',
-          '--ListItem-paddingX': '1rem',
-        }}
-      >
-
-        {chats?.map((chat) => (
-          <ChatListItem
-          key={chat._id} 
-          chatId={chat._id}  // Pass chatId explicitly
-          participants={chat.participants} 
-          lastmessage={lastMessage[chat._id]||chat.lastmessage} 
-        
-
-
-            />
-        ))}
-      </List>
-      </Skeleton>
-      }
-
-    
-
+            {chats?.map((chat) => (
+              <ChatListItem
+                key={chat._id}
+                chatId={chat._id} // Pass chatId explicitly
+                participants={chat.participants}
+                lastmessage={lastMessage[chat._id] || chat.lastmessage}
+              />
+            ))}
+          </List>
+        </Skeleton>
+      )}
     </Sheet>
   );
 }
