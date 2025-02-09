@@ -162,3 +162,16 @@ export const getMembers = errorHandler(async (req, res, next) => {
 
   res.status(200).json({ success: true, members });
 });
+
+export const searchUser = errorHandler(async (req, res, next) => {
+  const { search } = req.query;
+  const users = await userModel.find({
+    _id: { $ne: req.user._id },
+    $or: [
+      { username: { $regex: search, $options: "i" } }, // Case-insensitive name search
+      { fullname: { $regex: search, $options: "i" } }, // Case-insensitive email search
+    ],
+  }).select("fullname avtar")
+
+  res.status(200).json({ success: true, users });
+});

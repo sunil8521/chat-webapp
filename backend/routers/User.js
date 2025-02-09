@@ -1,4 +1,4 @@
-import {signIn,signUp,getMe,sendRequest,handleRequest,findFriends,findMyMessages,logout,getMembers} from "../functions/User.js"
+import {signIn,signUp,getMe,sendRequest,handleRequest,findFriends,findMyMessages,logout,getMembers,searchUser} from "../functions/User.js"
 import { Router } from "express"
 import { protector } from "../helpers/Protector.js"
 import chatModel from "../schema/Chat.js"
@@ -18,6 +18,8 @@ userRoutes.get("/friends",findFriends)
 
 userRoutes.get("/messages/:chatId",findMyMessages)
 userRoutes.get("/members/:chatId",getMembers)
+userRoutes.get("/users",searchUser)
+
 
 
 // userRoutes.post("/c",async(req,res)=>{
