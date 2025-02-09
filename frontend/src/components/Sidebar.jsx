@@ -32,12 +32,15 @@ import { toggleFindFriendsModal, toggleNotofocationModal } from "../redux/reduce
 import { routes } from '../routes/routes';
 import ColorSchemeToggle from "./ColorSchemeToggle";
 import { useLocation } from "react-router-dom";
-
+import {useLazySearchUserQuery} from "../redux/api"
+import { useDebounce } from "../hooks/useDebounce";
 export default function Sidebar() {
   const location=useLocation()
+  
   const { user, loading } = useSelector((state) => state.AUTH);
   const sidebarRoutes = routes.filter((route) => route.sidebar);
-
+const data=useLazySearchUserQuery()
+ console.log(data)
   const dispatch = useDispatch();
   const handleLogout = async () => {
     await axios.get(`${import.meta.env.VITE_SERVERURL}/api/user/logout`, {
@@ -47,17 +50,8 @@ export default function Sidebar() {
     dispatch(deleteUser());
   };
   const { findFriends,notifications } = useSelector((state) => state.MODAL);
-  const [searchTerm, setSearchTerm] = useState("");
+const {searchTerm,setSearchTerm}=useDebounce()
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      console.log(searchTerm);
-    }, 1000);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [searchTerm]);
 
   return (
     <Sheet
@@ -168,23 +162,7 @@ export default function Sidebar() {
             </ListItemButton>
           </ListItem>
 
-          {/* <ListItem>
-            <ListItemButton onClick={() => dispatch(toggleFindFriendsModal())}>
-              <GroupRoundedIcon />
-              <ListItemContent>
-                <Typography level="title-sm">Find users</Typography>
-              </ListItemContent>
-            </ListItemButton>
-          </ListItem>
-
-          <ListItem>
-            <ListItemButton onClick={() => dispatch(toggleNotofocationModal())}>
-              <GroupRoundedIcon />
-              <ListItemContent>
-                <Typography level="title-sm">Notifications</Typography>
-              </ListItemContent>
-            </ListItemButton>
-          </ListItem> */}
+         
         </List>
 
         {/* to user profile */}

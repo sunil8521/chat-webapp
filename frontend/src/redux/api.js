@@ -20,13 +20,16 @@ import {createApi,fetchBaseQuery} from "@reduxjs/toolkit/query/react"
           chatMessages:builder.query({
             query:({id,page})=>({url:`/api/user/messages/${id}?page=${page}`}),
             keepUnusedDataFor: 0,
+          }),
+          searchUser:builder.query({
+            query:(search)=>({url:`/api/user/users?search=${search}`})
           })
 
     })
 })
 
 
-export const {useMyAllchatQuery,useChatMembersQuery,useChatMessagesQuery}=allAPI
+export const {useMyAllchatQuery,useChatMembersQuery,useChatMessagesQuery,useLazySearchUserQuery}=allAPI
 export default allAPI
 
 
