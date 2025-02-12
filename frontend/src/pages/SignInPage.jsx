@@ -37,126 +37,125 @@ export default function SignInPage() {
    }
   };
   return (
-    <Box
+<Box
+  sx={{
+    minHeight: "100dvh",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    bgcolor: "background.body", // Theme-aware background color
+  }}
+>
+  <Sheet
+    variant="outlined"
+    sx={{
+      width: 400,
+      p: 4,
+      borderRadius: "md",
+      boxShadow: "lg",
+      bgcolor: "background.surface", // Theme-aware background color
+    }}
+  >
+    <Typography
+      level="h2"
+      component="h2"
       sx={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        bgcolor: "neutral.900",
+        mb: 2,
+        textAlign: "center",
+        fontWeight: "bold",
+        color: "text.primary", // Theme-aware text color
       }}
     >
-      <Sheet
-        variant="outlined"
+      Sign in
+    </Typography>
+
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <FormControl error={!!errors.email}>
+        <Input
+          autoFocus
+          placeholder={errors.email ? errors.email.message : "Email"}
+          type="email"
+          fullWidth
+          sx={{
+            mb: 2,
+            bgcolor: "background.level1", // Theme-aware background color
+            borderColor: "neutral.outlinedBorder", // Theme-aware border color
+            "&:hover": { borderColor: "primary.outlinedHoverBorder" }, // Theme-aware hover color
+          }}
+          {...register("email", {
+            required: "Email is required",
+          })}
+        />
+      </FormControl>
+
+      <FormControl error={!!errors.password}>
+        <Input
+          placeholder={errors.password ? errors.password.message : "Password"}
+          type="password"
+          fullWidth
+          sx={{
+            mb: 2,
+            bgcolor: "background.level1", // Theme-aware background color
+            borderColor: "neutral.outlinedBorder", // Theme-aware border color
+            "&:hover": { borderColor: "primary.outlinedHoverBorder" }, // Theme-aware hover color
+          }}
+          {...register("password", {
+            required: "Password is required",
+          })}
+        />
+      </FormControl>
+
+      <Button
+        type="submit"
+        fullWidth
         sx={{
-          width: 400,
-          p: 4,
-          borderRadius: "md",
-          boxShadow: "lg",
-          bgcolor: "neutral.800",
+          mb: 2,
+          bgcolor: "primary.500", // Theme-aware button color
+          "&:hover": { bgcolor: "primary.600" }, // Theme-aware hover color
         }}
+        disabled={isSubmitting}
+        loading={isSubmitting}
       >
-        <Typography
-          level="h2"
-          component="h2"
-          sx={{
-            mb: 2,
-            textAlign: "center",
-            fontWeight: "bold",
-            color: "neutral.100",
-          }}
-        >
-          Sign in
-        </Typography>
+        Sign in
+      </Button>
+    </form>
 
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <FormControl error={!!errors.email}>
-            <Input
-            autoFocus
-              placeholder={errors.email ? errors.email.message : "Email"}
-              type="email"
-              fullWidth
-              sx={{
-                color:"white",
-                mb: 2,
-                bgcolor: "neutral.700",
-                borderColor: "neutral.600",
-                "&:hover": { borderColor: "neutral.500" },
-                
-              }}
-              {...register("email", {
-                required: "Email is required",
-              })}
-            />
-          </FormControl>
-          <FormControl error={!!errors.password}>
-            <Input
-              placeholder={
-                errors.password ? errors.password.message : "Password"
-              }
-              type="password"
-              fullWidth
-              sx={{
-                mb: 2,
-                color:"white",
-                bgcolor: "neutral.700",
-                borderColor: "neutral.600",
-                "&:hover": { borderColor: "neutral.500" },
-              }}
-              {...register("password", {
-                required: "Password is required",
-              })}
-            />
-          </FormControl>
+    <Typography
+      level="body-sm"
+      sx={{
+        textAlign: "center",
+        color: "text.secondary", // Theme-aware text color
+        mb: 2,
+      }}
+    >
+      <Link
+        component={RouterLink}
+        to="/signup"
+        sx={{ textDecoration: "none", color: "primary.500" }} // Theme-aware link color
+      >
+        Forgot your password?
+      </Link>
+    </Typography>
 
-          <Button
-            type="submit"
-            fullWidth
-            sx={{
-              mb: 2,
-              // bgcolor: "primary.500",
-              "&:hover": { bgcolor: "primary.600" },
-            }}
-            disabled={isSubmitting}
-            loading={isSubmitting}
-          >
-            Sign in
-          </Button>
-        </form>
-        <Typography
-          level="body-sm"
-          sx={{
-            textAlign: "center",
-            color: "neutral.300",
-            mb: 2,
-          }}
-        >
-          <Link
-            component={RouterLink}
-            to="/signup"
-            sx={{ textDecoration: "none", color: "primary.600" }}
-          >
-            Forgot your password?
-          </Link>
-        </Typography>
-        <Divider sx={{ mb: 2, color: "neutral.600" }}>or</Divider>
-        <Typography
-          level="body-sm"
-          sx={{
-            textAlign: "center",
-            color: "neutral.300",
-          }}
-        >
-          {"Don't have an account?"}{" "}
-          <Link
-            component={RouterLink}
-            to="/signup"
-            sx={{ textDecoration: "none", color: "primary.400" }}
-          >
-            Sign up
-          </Link>
-        </Typography>
-      </Sheet>
-    </Box>
+    <Divider sx={{ mb: 2, color: "divider" }}>or</Divider> {/* Theme-aware divider color */}
+
+    <Typography
+      level="body-sm"
+      sx={{
+        textAlign: "center",
+        color: "text.secondary", // Theme-aware text color
+      }}
+    >
+      {"Don't have an account?"}{" "}
+      <Link
+        component={RouterLink}
+        to="/signup"
+        sx={{ textDecoration: "none", color: "primary.500" }} // Theme-aware link color
+      >
+        Sign up
+      </Link>
+    </Typography>
+  </Sheet>
+</Box>
   );
 }

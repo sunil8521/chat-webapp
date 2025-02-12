@@ -26,13 +26,19 @@ export default function MessageInput({ payload }) {
 
     if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify({ message }));
-      // console.log("Message sent to server:", message);
     }
     else{
       toast.error("Server error, can not send message")
     }
     reset();
   };
+  const handleBold=()=>{
+  
+    const val=getValues()
+    const newVal=`<strong>${val.message}</strong>`
+    setValue("message",newVal)
+    
+  }
 
   return (
     <Box sx={{ px: 2, pb: 3 }}>
@@ -58,7 +64,7 @@ export default function MessageInput({ payload }) {
                 }}
               >
                 <div>
-                  <IconButton size="sm" variant="plain" color="neutral">
+                  <IconButton size="sm" variant="plain" color="neutral" onClick={handleBold}>
                     <FormatBoldRoundedIcon />
                   </IconButton>
                   <IconButton size="sm" variant="plain" color="neutral">

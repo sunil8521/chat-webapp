@@ -4,13 +4,13 @@ import messageModel from "./schema/Message.js";
 import chatModel from "./schema/Chat.js";
 const users = new Map();
 const broadcastOnlineUsers = () => {
-  const onlineUsers = Array.from(users.keys()); 
+  const onlineUsers = Array.from(users.keys());
   users.forEach((ws) => {
     if (ws.readyState === ws.OPEN) {
       ws.send(
         JSON.stringify({
           type: "online_users",
-          users: onlineUsers, 
+          users: onlineUsers,
         })
       );
     }
@@ -30,35 +30,45 @@ const websocketServer = (server) => {
         ws.close(1008, "Invalid user");
         return;
       }
-      users.set(userId, ws)
+      users.set(userId, ws);
       broadcastOnlineUsers();
-
     } catch (error) {
       ws.close(1011, "Internal server error");
       return;
     }
 
-
     ws.on("message", async function incoming(message) {
       const { message: data } = JSON.parse(message);
-      const { chatid, senderid, content, members } = data.payload;
-
+      if (data.type === "friendrequest") {
+        const socketUser=users.get(data.payload.id)
+       if(socketUser){
+        socketUser.send(JSON.stringify({
+          type:"notification",
+          id:data.payload.id,
+          avtar:data.payload.avtar,
+          fullname:data.payload.fullname
+        }))
+       }
+       
+      }
       if (data.type === "message") {
+        const { chatid, senderid, content, members } = data.payload;
 
         const memberSocket = members
-        .map((id) => users.get(id))
-        .filter((ws) => ws !== undefined);
-        memberSocket.forEach((ws) => {
-        ws.send(
-          JSON.stringify({
-            type: "last_message",
-            chatid: chatid,
-            content: content,
-            updatedAt: Date.now(),
-          })
-        )}) // this will send last message
+          .map((id) => users.get(id))
+          .filter((ws) => ws !== undefined);
 
-    
+        memberSocket.forEach((ws) => {
+          ws.send(
+            JSON.stringify({
+              type: "last_message",
+              chatid: chatid,
+              content: content,
+              updatedAt: Date.now(),
+            })
+          );
+        }); // this will send last message
+
         memberSocket.forEach((ws) => {
           ws.send(
             JSON.stringify({

@@ -4,6 +4,8 @@ import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import Person from "@mui/icons-material/Person";
 import PersonAddRounded from "@mui/icons-material/PersonAddRounded";
+
+import HowToRegIcon from "@mui/icons-material/HowToReg";
 import QuestionAnswerRoundedIcon from "@mui/icons-material/QuestionAnswerRounded";
 import SearchRounded from "@mui/icons-material/SearchRounded";
 import Avatar from "@mui/joy/Avatar";
@@ -28,19 +30,39 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { closeSidebar, toggleMessagesPane } from "../../utils";
 import { deleteUser } from "../redux/reducer/auth";
-import { toggleFindFriendsModal, toggleNotofocationModal } from "../redux/reducer/modal";
-import { routes } from '../routes/routes';
+import {
+  toggleFindFriendsModal,
+  toggleNotofocationModal,
+} from "../redux/reducer/modal";
+import { routes } from "../routes/routes";
 import ColorSchemeToggle from "./ColorSchemeToggle";
 import { useLocation } from "react-router-dom";
-import {useLazySearchUserQuery} from "../redux/api"
+import { useLazySearchUserQuery } from "../redux/api";
 import { useDebounce } from "../hooks/useDebounce";
+import MiniLoader from "../shared/MiniLoader";
+import {
+  useSendFrindRequestMutation,
+  useGetFrindRequestQuery,
+  useHandleFrindRequestMutation,
+} from "../redux/api";
+import { useGlobalVar } from "../context/ContextUse";
+
 export default function Sidebar() {
-  const location=useLocation()
-  
+  const { ws } = useGlobalVar();
+  const location = useLocation();
+const []=useState([])
   const { user, loading } = useSelector((state) => state.AUTH);
   const sidebarRoutes = routes.filter((route) => route.sidebar);
-const data=useLazySearchUserQuery()
- console.log(data)
+  const [reSearch, { data, isError, isFetching }] = useLazySearchUserQuery();
+  const []=
+  const {
+    data: friendRequestData,
+    isFetching: friendRequestLoading,
+    isError: friendRequestError,
+  } = useGetFrindRequestQuery();
+  const [handleFriendRequest, { isLoading, error }] =
+    useHandleFrindRequestMutation();
+
   const dispatch = useDispatch();
   const handleLogout = async () => {
     await axios.get(`${import.meta.env.VITE_SERVERURL}/api/user/logout`, {
@@ -49,10 +71,64 @@ const data=useLazySearchUserQuery()
     toast.success("Logout successfully");
     dispatch(deleteUser());
   };
-  const { findFriends,notifications } = useSelector((state) => state.MODAL);
-const {searchTerm,setSearchTerm}=useDebounce()
+  const { findFriends, notifications } = useSelector((state) => state.MODAL);
 
+  const [searchTerm, setSearchTerm] = useState("");
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      reSearch(searchTerm);
+      2;
+    }, 1000);
 
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [searchTerm, reSearch]);
+  const [sendFrindRequest] = useSendFrindRequestMutation();
+
+  const sendRequest = async (id, avtar, fullname) => {
+    //     const toastId=toast.loading("Sending...")
+    //     const res = await sendFrindRequest({ touserid: id });
+    //     if (res.error) {
+    //       toast.error(res.error.data?.message || "Something went wrong",{id:toastId}); // Display error
+    //     } else {
+    //       toast.success("Friend request sent!",{id:toastId});
+
+    const message = { type: "friendrequest", payload: { id, avtar, fullname } };
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ message }));
+    } else {
+      toast.error("Server error, can not send message");
+    }
+  };
+  //     }
+  useEffect(() => {
+    if (!ws) return;
+    const handleMessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === "notification") {
+
+    
+      }
+    };
+    ws.addEventListener("message", handleMessage);
+    
+    ws.addE
+    return ()=>{
+      ws.removeEventListener("message", handleMessage);
+
+    }
+
+  }, [ws]);
+
+  const handleRequest = async (data) => {
+    try {
+      const res = await handleFriendRequest(data).unwrap();
+      console.log("Request successful:", res);
+    } catch (err) {
+      console.error("Error handling request:", err);
+    }
+  };
   return (
     <Sheet
       className="Sidebar"
@@ -114,7 +190,6 @@ const {searchTerm,setSearchTerm}=useDebounce()
         <ColorSchemeToggle sx={{ ml: "auto" }} />
       </Box>
 
-
       <Box
         onClick={() => closeSidebar()}
         sx={{
@@ -137,7 +212,11 @@ const {searchTerm,setSearchTerm}=useDebounce()
           }}
         >
           <ListItem>
-            <ListItemButton selected={location.pathname.includes("home")} component={Link} to="/home">
+            <ListItemButton
+              selected={location.pathname.includes("home")}
+              component={Link}
+              to="/home"
+            >
               <HomeRoundedIcon />
               <ListItemContent>
                 <Typography level="title-sm">Home</Typography>
@@ -145,7 +224,7 @@ const {searchTerm,setSearchTerm}=useDebounce()
             </ListItemButton>
           </ListItem>
 
-          <ListItem sx={{display:{xs:"unset",sm:"none"}}}>
+          <ListItem sx={{ display: { xs: "unset", sm: "none" } }}>
             <ListItemButton onClick={() => toggleMessagesPane()}>
               <QuestionAnswerRoundedIcon />
               <ListItemContent>
@@ -153,16 +232,19 @@ const {searchTerm,setSearchTerm}=useDebounce()
               </ListItemContent>
             </ListItemButton>
           </ListItem>
-          <ListItem >
-            <ListItemButton selected={location.pathname.includes("profile")} role="menuitem" component={Link} to="/profile">
+          <ListItem>
+            <ListItemButton
+              selected={location.pathname.includes("profile")}
+              role="menuitem"
+              component={Link}
+              to="/profile"
+            >
               <Person />
               <ListItemContent>
                 <Typography level="title-sm">My profile</Typography>
               </ListItemContent>
             </ListItemButton>
           </ListItem>
-
-         
         </List>
 
         {/* to user profile */}
@@ -233,36 +315,55 @@ const {searchTerm,setSearchTerm}=useDebounce()
             }}
           >
             <List>
-              {/* Example users - replace with actual data */}
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((user) => (
-                <ListItem
-                  key={user}
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    py: 1,
-                    borderRadius: "sm",
-                    "&:hover": {
-                      backgroundColor: "background.level1",
-                    },
-                  }}
-                >
-                  <Box sx={{ display: "flex", gap: 1 }}>
-                    <Avatar></Avatar>
-                    <Typography>User {user}</Typography>
-                  </Box>
+              {isFetching ? (
+                <MiniLoader />
+              ) : isError ? (
+                <Typography>error</Typography>
+              ) : (
+                <>
+                  {data?.users?.map((user) => (
+                    <ListItem
+                      key={user._id}
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        py: 1,
+                        borderRadius: "sm",
+                        "&:hover": {
+                          backgroundColor: "background.level1",
+                        },
+                      }}
+                    >
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                      >
+                        <Avatar src={user.avtar} alt={user.fullname} />
+                        <Typography>{user.fullname}</Typography>
+                      </Box>
 
-                  <Button
-                    variant="outlined"
-                    size="sm"
-                    startDecorator={<PersonAddRounded />}
-                    sx={{ ml: 1 }}
-                  >
-                    Add Friend
-                  </Button>
-                </ListItem>
-              ))}
+                      <Button
+                        onClick={() => {
+                          sendRequest(user._id, user.avtar, user.fullname);
+                        }}
+                        disabled={user.isMyFriend}
+                        variant="outlined"
+                        size="sm"
+                        startDecorator={
+                          user.isMyFriend ? (
+                            <HowToRegIcon />
+                          ) : (
+                            <PersonAddRounded />
+                          )
+                        }
+                        sx={{ ml: 1 }}
+                      >
+                        {user.isMyFriend ? "In Friend" : "Add Friend"}
+                      </Button>
+                    </ListItem>
+                  ))}
+                </>
+              )}
             </List>
           </Box>
         </Sheet>
@@ -305,9 +406,9 @@ const {searchTerm,setSearchTerm}=useDebounce()
             }}
           >
             <List>
-              {[1, 2, 3, 4, 5, 6, 7, 8].map((request) => (
+              {friendRequestData?.requests?.map((request) => (
                 <ListItem
-                  key={request}
+                  key={request._id}
                   sx={{
                     display: "flex",
                     justifyContent: "space-between",
@@ -321,17 +422,37 @@ const {searchTerm,setSearchTerm}=useDebounce()
                   }}
                 >
                   <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                    <Avatar size="sm" src="/static/images/avatar/1.jpg" />
+                    <Avatar size="sm" src={request?.fromuserid.avtar} />
                     <Typography sx={{ fontWeight: "md" }}>
-                      John Doe {request}
+                      {request?.fromuserid.fullname}
                     </Typography>
                   </Box>
 
                   <Box sx={{ display: "flex", gap: 1 }}>
-                    <IconButton variant="solid" color="success" size="sm">
+                    <IconButton
+                      variant="solid"
+                      color="success"
+                      size="sm"
+                      onClick={() => {
+                        handleRequest({
+                          status: "accept",
+                          requestid: request._id,
+                        });
+                      }}
+                    >
                       <CheckRounded />
                     </IconButton>
-                    <IconButton variant="outlined" color="neutral" size="sm">
+                    <IconButton
+                      variant="outlined"
+                      color="neutral"
+                      size="sm"
+                      onClick={() => {
+                        handleRequest({
+                          status: "reject",
+                          requestid: request._id,
+                        });
+                      }}
+                    >
                       <CloseRounded />
                     </IconButton>
                   </Box>
@@ -341,7 +462,6 @@ const {searchTerm,setSearchTerm}=useDebounce()
           </Box>
         </Sheet>
       </Modal>
-
     </Sheet>
   );
 }

@@ -4,7 +4,7 @@ import Sheet from "@mui/joy/Sheet";
 import CircularProgress from "@mui/joy/CircularProgress";
 import Stack from "@mui/joy/Stack";
 import { useParams } from "react-router-dom";
-
+import MiniLoader from "../../shared/MiniLoader"
 import ChatBubble from "../../components/ChatBubble";
 import MessageInput from "../../components/MessageInput";
 import MessagesPaneHeader from "../../components/MessagesPaneHeader";
@@ -194,9 +194,7 @@ const MessagesPane = () => {
       >
         <Stack spacing={2} sx={{ justifyContent: "flex-end" }}>
           {messageIsFetching && (
-            <Box sx={{ display: "flex", justifyContent: "center" }}>
-              <CircularProgress variant="soft" />
-            </Box>
+          <MiniLoader/>
           )}
           {allMessages?.map((message, index) => {
             const isYou =

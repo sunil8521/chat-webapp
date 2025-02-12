@@ -1,5 +1,5 @@
 export const getTimeDifference = (timestamp) => {
-    if (!timestamp) return "Just now";
+    if (!timestamp) return ;
   
     const now = Date.now();
     const past = new Date(timestamp).getTime();

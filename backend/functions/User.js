@@ -84,7 +84,16 @@ export const handleRequest = errorHandler(async (req, res, next) => {
     });
   }
 });
-
+export const myfrinendRequest = errorHandler(async (req, res, next) => {
+  const requests=await requestModel.find({
+    touserid:req.user._id
+  }).populate({
+    path:"fromuserid",
+    model: userModel,
+    select: "fullname avtar username",
+  })
+  res.status(200).json({ success: true,requests });
+});
 export const findFriends = errorHandler(async (req, res, next) => {
   const yourUserId = req.user._id;
 
@@ -165,13 +174,33 @@ export const getMembers = errorHandler(async (req, res, next) => {
 
 export const searchUser = errorHandler(async (req, res, next) => {
   const { search } = req.query;
-  const users = await userModel.find({
-    _id: { $ne: req.user._id },
-    $or: [
-      { username: { $regex: search, $options: "i" } }, // Case-insensitive name search
-      { fullname: { $regex: search, $options: "i" } }, // Case-insensitive email search
-    ],
-  }).select("fullname avtar")
+
+  const yourUserId = req.user._id;
+
+  let allReadyFriends = await chatModel.find({ participants: yourUserId });
+  allReadyFriends = allReadyFriends.map(({ participants }) => {
+    return participants
+      .find(({ _id }) => _id.toString() !== yourUserId.toString())
+      .toString();
+  });
+
+  let users = await userModel
+    .find({
+      _id: { $ne: req.user._id },
+      $or: [
+        { username: { $regex: search, $options: "i" } }, // Case-insensitive name search
+        { fullname: { $regex: search, $options: "i" } }, // Case-insensitive email search
+      ],
+    })
+    .select("fullname avtar");
+  users = users.map(({ _id, fullname, avtar }) => {
+    return {
+      _id,
+      fullname,
+      avtar,
+      isMyFriend: allReadyFriends.includes(_id.toString()),
+    };
+  });
 
   res.status(200).json({ success: true, users });
 });
