@@ -1,4 +1,4 @@
-import { CheckRounded, CloseRounded } from "@mui/icons-material";
+import { CheckRounded, CloseRounded, Refresh } from "@mui/icons-material";
 import BrightnessAutoRoundedIcon from "@mui/icons-material/BrightnessAutoRounded";
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
@@ -38,7 +38,6 @@ import { routes } from "../routes/routes";
 import ColorSchemeToggle from "./ColorSchemeToggle";
 import { useLocation } from "react-router-dom";
 import { useLazySearchUserQuery } from "../redux/api";
-import { useDebounce } from "../hooks/useDebounce";
 import MiniLoader from "../shared/MiniLoader";
 import {
   useSendFrindRequestMutation,
@@ -46,20 +45,24 @@ import {
   useHandleFrindRequestMutation,
 } from "../redux/api";
 import { useGlobalVar } from "../context/ContextUse";
-
+import { handleNotificationsCount } from "../redux/reducer/notification";
+import { Alert } from "@mui/joy";
 export default function Sidebar() {
   const { ws } = useGlobalVar();
   const location = useLocation();
-const []=useState([])
-  const { user, loading } = useSelector((state) => state.AUTH);
-  const sidebarRoutes = routes.filter((route) => route.sidebar);
+  const { user } = useSelector((state) => state.AUTH);
   const [reSearch, { data, isError, isFetching }] = useLazySearchUserQuery();
-  const []=
+  const [friendRequest, setFriendRequest] = useState([]);
   const {
+    refetch,
     data: friendRequestData,
     isFetching: friendRequestLoading,
     isError: friendRequestError,
   } = useGetFrindRequestQuery();
+  useEffect(() => {
+    setFriendRequest(friendRequestData?.requests);
+  }, [friendRequestData]);
+
   const [handleFriendRequest, { isLoading, error }] =
     useHandleFrindRequestMutation();
 
@@ -86,49 +89,45 @@ const []=useState([])
   }, [searchTerm, reSearch]);
   const [sendFrindRequest] = useSendFrindRequestMutation();
 
-  const sendRequest = async (id, avtar, fullname) => {
-    //     const toastId=toast.loading("Sending...")
-    //     const res = await sendFrindRequest({ touserid: id });
-    //     if (res.error) {
-    //       toast.error(res.error.data?.message || "Something went wrong",{id:toastId}); // Display error
-    //     } else {
-    //       toast.success("Friend request sent!",{id:toastId});
-
-    const message = { type: "friendrequest", payload: { id, avtar, fullname } };
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify({ message }));
+  const sendRequest = async (id) => {
+    const toastId = toast.loading("Sending...");
+    const res = await sendFrindRequest({ touserid: id });
+    if (res.error) {
+      toast.error(res.error.data?.message || "Something went wrong", {
+        id: toastId,
+      }); // Display error
     } else {
-      toast.error("Server error, can not send message");
+      toast.success("Friend request sent!", { id: toastId });
     }
   };
-  //     }
   useEffect(() => {
     if (!ws) return;
     const handleMessage = (event) => {
       const data = JSON.parse(event.data);
       if (data.type === "notification") {
-
-    
+        console.log("refectch")
+        refetch();
+        // setFriendRequest((prev) => [...prev, data.payload]);
+        // dispatch(handleNotificationsCount(1));
+      }
+      if (data.type === "notification_status") {
+        console.log("notification recive");
       }
     };
     ws.addEventListener("message", handleMessage);
-    
-    ws.addE
-    return ()=>{
+    return () => {
       ws.removeEventListener("message", handleMessage);
-
-    }
-
-  }, [ws]);
+    };
+  }, [ws,refetch]);
 
   const handleRequest = async (data) => {
     try {
       const res = await handleFriendRequest(data).unwrap();
-      console.log("Request successful:", res);
     } catch (err) {
-      console.error("Error handling request:", err);
+      // console.error("Error handling request:", err);
     }
   };
+
   return (
     <Sheet
       className="Sidebar"
@@ -266,6 +265,7 @@ const []=useState([])
         </Box>
       </Box>
 
+      {/* search user modal */}
       <Modal
         open={findFriends}
         onClose={() => dispatch(toggleFindFriendsModal())}
@@ -344,7 +344,7 @@ const []=useState([])
 
                       <Button
                         onClick={() => {
-                          sendRequest(user._id, user.avtar, user.fullname);
+                          sendRequest(user._id);
                         }}
                         disabled={user.isMyFriend}
                         variant="outlined"
@@ -369,6 +369,7 @@ const []=useState([])
         </Sheet>
       </Modal>
 
+      {/* to see friend request modal */}
       <Modal
         open={notifications}
         onClose={() => dispatch(toggleNotofocationModal())}
@@ -406,7 +407,7 @@ const []=useState([])
             }}
           >
             <List>
-              {friendRequestData?.requests?.map((request) => (
+              {friendRequest?.map((request) => (
                 <ListItem
                   key={request._id}
                   sx={{
@@ -422,9 +423,9 @@ const []=useState([])
                   }}
                 >
                   <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                    <Avatar size="sm" src={request?.fromuserid.avtar} />
+                    <Avatar size="sm" src={request?.fromuserid?.avtar} />
                     <Typography sx={{ fontWeight: "md" }}>
-                      {request?.fromuserid.fullname}
+                      {request?.fromuserid?.fullname}
                     </Typography>
                   </Box>
 

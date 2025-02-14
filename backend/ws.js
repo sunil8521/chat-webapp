@@ -2,7 +2,7 @@ import { WebSocketServer } from "ws";
 import userModel from "./schema/User.js";
 import messageModel from "./schema/Message.js";
 import chatModel from "./schema/Chat.js";
-const users = new Map();
+export const users = new Map();
 const broadcastOnlineUsers = () => {
   const onlineUsers = Array.from(users.keys());
   users.forEach((ws) => {
@@ -39,18 +39,22 @@ const websocketServer = (server) => {
 
     ws.on("message", async function incoming(message) {
       const { message: data } = JSON.parse(message);
-      if (data.type === "friendrequest") {
-        const socketUser=users.get(data.payload.id)
-       if(socketUser){
-        socketUser.send(JSON.stringify({
-          type:"notification",
-          id:data.payload.id,
-          avtar:data.payload.avtar,
-          fullname:data.payload.fullname
-        }))
-       }
-       
-      }
+
+      // if (data.type === "friendrequest") {
+      //   const socketUser = users.get(data.payload.id);
+      //   if (socketUser) {
+      //     socketUser.send(
+      //       JSON.stringify({
+      //         type: "notification",
+      //         payload: {
+      //           id: data.payload.id,
+      //           avtar: data.payload.avtar,
+      //           fullname: data.payload.fullname,
+      //         },
+      //       })
+      //     );
+      //   }
+      // }
       if (data.type === "message") {
         const { chatid, senderid, content, members } = data.payload;
 

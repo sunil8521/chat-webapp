@@ -4,6 +4,7 @@ import { CustomError, errorHandler } from "../error/error.js";
 import { tokenProvider, cookieOption } from "../helpers/TokenProvider.js";
 import chatModel from "../schema/Chat.js";
 import messageModel from "../schema/Message.js";
+import { Emit } from "../helpers/EventEmit.js";
 
 export const signUp = errorHandler(async (req, res, next) => {
   const newUser = await userModel.create(req.body);
@@ -54,21 +55,46 @@ export const sendRequest = errorHandler(async (req, res, next) => {
     fromuserid: sender,
     touserid,
   });
-
+  const data = {
+    type: "notification",
+    payload: {
+      _id: createRequest._id,
+      fromuserid: {
+        _id: req.user._id,
+        avtar: req.user.avtar,
+        fullname: req.user.fullname,
+      },
+    },
+  };
+  Emit([touserid], data); //emit the event
   res.status(201).json({ success: true, message: "Friend request sent" });
 });
 
 export const handleRequest = errorHandler(async (req, res, next) => {
   const { status, requestid } = req.body;
-  const request = await requestModel.findById(requestid);
+  const request = await requestModel.findById(requestid).populate({
+    path: "fromuserid",
+    model: userModel,
+    select: "fullname avtar",
+  });
+  const data={
+    type:"notification_status",
+    payload:{
+      fulname:request.fromuserid.fullname,
+      avtar:request.fromuserid.avtar,
+      status
+    }
+  }
   if (!request) {
     return next(new CustomError("Request not found.", 404));
   }
   if (status === "accept") {
-    await chatModel.create({
-      participants: [request.fromuserid, request.touserid],
-    });
-    await requestModel.findByIdAndDelete(requestid);
+    
+    // await chatModel.create({
+    //   participants: [request.fromuserid._id, request.touserid],
+    // });
+    // await requestModel.findByIdAndDelete(requestid);
+    Emit([request.fromuserid._id.toString()],data)
     return res.status(200).json({
       success: true,
       message: "Friend request accepted. Chat created.",
@@ -76,23 +102,28 @@ export const handleRequest = errorHandler(async (req, res, next) => {
   }
 
   if (status === "reject") {
-    await requestModel.findByIdAndDelete(requestid);
+    // await requestModel.findByIdAndDelete(requestid);
+    Emit([request.fromuserid._id.toString()],data)
 
     return res.status(200).json({
       success: true,
       message: "Friend request rejected.",
     });
   }
+
 });
+
 export const myfrinendRequest = errorHandler(async (req, res, next) => {
-  const requests=await requestModel.find({
-    touserid:req.user._id
-  }).populate({
-    path:"fromuserid",
-    model: userModel,
-    select: "fullname avtar username",
-  })
-  res.status(200).json({ success: true,requests });
+  const requests = await requestModel
+    .find({
+      touserid: req.user._id,
+    })
+    .populate({
+      path: "fromuserid",
+      model: userModel,
+      select: "fullname avtar username",
+    });
+  res.status(200).json({ success: true, requests });
 });
 export const findFriends = errorHandler(async (req, res, next) => {
   const yourUserId = req.user._id;

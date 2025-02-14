@@ -22,7 +22,8 @@ const allAPI = createApi({
     }),
     searchUser: builder.query({
       query: (search) => ({ url: `/api/user/users?search=${search}` }),
-      providesTags:["FriendRequests"]
+      providesTags:["FriendRequests"],
+
     }),
     sendFrindRequest: builder.mutation({
       query: (data) => ({
@@ -36,6 +37,7 @@ const allAPI = createApi({
     }),
     getFrindRequest: builder.query({
       query: () => ({ url: `/api/user/requests`}),
+      keepUnusedDataFor: 0,
       providesTags: ["FriendRequests"]
     }),
     handleFrindRequest: builder.mutation({
