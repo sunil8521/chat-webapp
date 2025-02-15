@@ -105,10 +105,8 @@ export default function Sidebar() {
     const handleMessage = (event) => {
       const data = JSON.parse(event.data);
       if (data.type === "notification") {
-        console.log("refectch")
         refetch();
-        // setFriendRequest((prev) => [...prev, data.payload]);
-        // dispatch(handleNotificationsCount(1));
+        dispatch(handleNotificationsCount(1));
       }
       if (data.type === "notification_status") {
         console.log("notification recive");
@@ -118,7 +116,7 @@ export default function Sidebar() {
     return () => {
       ws.removeEventListener("message", handleMessage);
     };
-  }, [ws,refetch]);
+  }, [ws,refetch,dispatch]);
 
   const handleRequest = async (data) => {
     try {

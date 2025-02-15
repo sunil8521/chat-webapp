@@ -90,10 +90,10 @@ export const handleRequest = errorHandler(async (req, res, next) => {
   }
   if (status === "accept") {
     
-    // await chatModel.create({
-    //   participants: [request.fromuserid._id, request.touserid],
-    // });
-    // await requestModel.findByIdAndDelete(requestid);
+    await chatModel.create({
+      participants: [request.fromuserid._id, request.touserid],
+    });
+    await requestModel.findByIdAndDelete(requestid);
     Emit([request.fromuserid._id.toString()],data)
     return res.status(200).json({
       success: true,
@@ -102,7 +102,7 @@ export const handleRequest = errorHandler(async (req, res, next) => {
   }
 
   if (status === "reject") {
-    // await requestModel.findByIdAndDelete(requestid);
+    await requestModel.findByIdAndDelete(requestid);
     Emit([request.fromuserid._id.toString()],data)
 
     return res.status(200).json({
