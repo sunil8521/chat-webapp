@@ -14,6 +14,8 @@ const WelcomeMessage = () => {
         backgroundColor: "background.level1",
       }}
     >
+
+      
       <Stack spacing={2} alignItems="center">
         <ChatBubbleOutlineIcon sx={{ fontSize: 64, color: "primary.main" }} />
         <Typography level="h2" component="h1" sx={{ fontWeight: "bold" }}>
