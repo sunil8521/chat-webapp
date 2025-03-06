@@ -1,12 +1,42 @@
 import Box from "@mui/joy/Box";
+import { useEffect } from "react";
 import { Sheet } from "@mui/joy";
 import LayoutPage from "./LayoutPage";
 import { useMyAllchatQuery } from "../../redux/api";
 import ChatsPane from "../ChatsPane";
+import { useGlobalVar } from "../../context/ContextUse";
+import toast from "react-hot-toast";
 
 function MessageLayout(WrappedComponent) {
   const WithLayout = (props) => {
-    const { data, isError, isLoading, error, refetch } = useMyAllchatQuery("");
+    const { ws } = useGlobalVar();
+    const { data, isError, isLoading, refetch } = useMyAllchatQuery("");
+    useEffect(() => {
+      if (!ws) return;
+      const handleMessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.type === "notification_status") {
+          if (data.payload.status === "accept") {
+            refetch();
+          }
+          const message = `${data.payload.fullname} ${data.payload.status} your request`;
+          const icon = `${data.payload.status === "accept" ? "👍" : "👎"}`;
+          toast(message, {
+            icon: icon,
+            style: {
+              borderRadius: "10px",
+              background: "#333",
+              color: "#fff",
+            },
+          });
+        }
+      };
+      ws.addEventListener("message", handleMessage);
+      return () => {
+        ws.removeEventListener("message", handleMessage);
+      };
+    }, [ws, refetch]);
+
     return (
       <Box component="main" className="MainContent" sx={{ flex: 1 }}>
         <Sheet

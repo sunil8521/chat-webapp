@@ -5,6 +5,7 @@ import { tokenProvider, cookieOption } from "../helpers/TokenProvider.js";
 import chatModel from "../schema/Chat.js";
 import messageModel from "../schema/Message.js";
 import { Emit } from "../helpers/EventEmit.js";
+import {UploadToCloudnary} from "../helpers/imageConfig.js"
 
 export const signUp = errorHandler(async (req, res, next) => {
   const newUser = await userModel.create(req.body);
@@ -29,6 +30,32 @@ export const signIn = errorHandler(async (req, res, next) => {
 export const getMe = (req, res, next) => {
   res.json(req.user);
 };
+
+export const updateProfile=errorHandler(async(req,res,next)=>{
+  const updateData = {}; 
+
+  if (req.file) {
+    const uploadResults = await UploadToCloudnary([req.file]);
+    updateData.avtar = uploadResults[0].secure_url;
+  }
+
+  if (req.body.username) updateData.username = req.body.username;
+  if (req.body.fullname) updateData.fullname = req.body.fullname;
+  if (req.body.email) updateData.email = req.body.email;
+
+    const updatedUser = await userModel.findByIdAndUpdate(
+      req.user._id, 
+      updateData, 
+      { new: true, runValidators: true } 
+    );
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+  
+  res.status(200).json({ success: true, message: "Profile upadated successfully" });
+
+
+})
 
 export const logout = (req, res, next) => {
   res
@@ -80,7 +107,7 @@ export const handleRequest = errorHandler(async (req, res, next) => {
   const data={
     type:"notification_status",
     payload:{
-      fulname:request.fromuserid.fullname,
+      fullname:request.fromuserid.fullname,
       avtar:request.fromuserid.avtar,
       status
     }
@@ -94,7 +121,7 @@ export const handleRequest = errorHandler(async (req, res, next) => {
       participants: [request.fromuserid._id, request.touserid],
     });
     await requestModel.findByIdAndDelete(requestid);
-    Emit([request.fromuserid._id.toString()],data)
+    Emit([request.fromuserid._id.toString()],data) //emit the event
     return res.status(200).json({
       success: true,
       message: "Friend request accepted. Chat created.",
@@ -103,7 +130,7 @@ export const handleRequest = errorHandler(async (req, res, next) => {
 
   if (status === "reject") {
     await requestModel.findByIdAndDelete(requestid);
-    Emit([request.fromuserid._id.toString()],data)
+    Emit([request.fromuserid._id.toString()],data) //emit the event
 
     return res.status(200).json({
       success: true,

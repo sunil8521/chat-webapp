@@ -24,7 +24,7 @@ import ModalClose from "@mui/joy/ModalClose";
 import Sheet from "@mui/joy/Sheet";
 import Typography from "@mui/joy/Typography";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useState,memo } from "react";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
@@ -46,8 +46,8 @@ import {
 } from "../redux/api";
 import { useGlobalVar } from "../context/ContextUse";
 import { handleNotificationsCount } from "../redux/reducer/notification";
-import { Alert } from "@mui/joy";
-export default function Sidebar() {
+
+ function Sidebar() {
   const { ws } = useGlobalVar();
   const location = useLocation();
   const { user } = useSelector((state) => state.AUTH);
@@ -108,9 +108,9 @@ export default function Sidebar() {
         refetch();
         dispatch(handleNotificationsCount(1));
       }
-      if (data.type === "notification_status") {
-        console.log("notification recive");
-      }
+      // if (data.type === "notification_status") {
+      //   toast.success("notification recive");
+      // }
     };
     ws.addEventListener("message", handleMessage);
     return () => {
@@ -464,3 +464,4 @@ export default function Sidebar() {
     </Sheet>
   );
 }
+export default memo(Sidebar)

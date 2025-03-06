@@ -1,14 +1,8 @@
-import * as React from "react";
+import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
 import GlobalStyles from "@mui/joy/GlobalStyles";
 import IconButton from "@mui/joy/IconButton";
 import Sheet from "@mui/joy/Sheet";
-import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
-import { toggleSidebar, toggleMessagesPane } from "../../utils";
-import Badge from "@mui/joy/Badge";
-import NotificationsRounded from "@mui/icons-material/NotificationsRounded";
-import Tooltip from "@mui/joy/Tooltip";
-import SearchIcon from "@mui/icons-material/Search";
-import { Box } from "@mui/material";
+import { toggleSidebar } from "../../utils";
 import SearchUserAndNotification from "../shared/SearchUserAndNotification";
 export default function Header() {
   return (

@@ -9,6 +9,7 @@ import websocketServer from "./ws.js";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
+import { v2 as imageUploader } from "cloudinary";
 
 // Get the filename and directory name
 const __filename = fileURLToPath(import.meta.url);
@@ -17,7 +18,12 @@ const app = express();
 app.use(express.json());
 app.use(CookieParser());
 // app.use(express.static(path.join(__dirname,"../real_time/dist")));
-
+imageUploader.config({
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET,
+  secure: true,
+});
 app.use(
   cors({
     origin: [

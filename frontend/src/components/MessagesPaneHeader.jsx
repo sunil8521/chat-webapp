@@ -10,11 +10,16 @@ import PhoneInTalkRoundedIcon from '@mui/icons-material/PhoneInTalkRounded';
 import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
 import { toggleMessagesPane } from '../../utils';
 import {useSelector} from "react-redux"
+import UserProfileModal from "../pages/UserProfileModal"
 export default function MessagesPaneHeader({sender}) {
   const { online_users } = useSelector((state) => state.ONLINEUSER);
-
+  console.log(sender)
+const getDetails=()=>{
+  
+}
   const online=online_users.includes(sender?._id)
   return (
+
     <Stack
       direction="row"
       sx={{
@@ -26,6 +31,7 @@ export default function MessagesPaneHeader({sender}) {
         backgroundColor: 'background.body',
       }}
     >
+      <UserProfileModal/>
       <Stack
         direction="row"
         spacing={{ xs: 1, md: 2 }}
@@ -41,8 +47,10 @@ export default function MessagesPaneHeader({sender}) {
           <ArrowBackIosNewRoundedIcon />
         </IconButton>
         <Avatar size="lg" src={sender?.avtar} />
+
         <div>
           <Typography
+          onClick={getDetails}
             component="h2"
             noWrap
             endDecorator={
@@ -61,7 +69,7 @@ export default function MessagesPaneHeader({sender}) {
                 </Chip>
               ) : undefined
             }
-            sx={{ fontWeight: 'lg', fontSize: 'lg' }}
+            sx={{ fontWeight: 'lg', fontSize: 'lg',":hover":{textDecoration:"underline" ,cursor:"pointer"} }}
           >
             {sender?.fullname}
           </Typography>
