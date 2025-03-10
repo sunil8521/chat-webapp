@@ -10,19 +10,14 @@ import {
   Divider,
   Button,
 } from "@mui/joy";
-
-const UserProfileModal = ( ) => {
-    const user = {
-        profilePic: 'https://via.placeholder.com/150', // Placeholder image URL
-        name: 'Shivam Kumar',
-        username: 'letshivamcode',
-        about: 'AIML and Cybersec Enthusiast | Full stack developer | Programmer',
-        joinDate: '23 Jul 2019',
-      };
+import moment from "moment"
+import { useDispatch, useSelector } from "react-redux";
+import { toggleSeeUserProfileModal } from "../redux/reducer/modal";
+const UserProfileModal = () => {
+  const dispatch = useDispatch();
+  const { seeUserProfile ,userProfileData} = useSelector((state) => state.MODAL);
   return (
-    <Modal open={false} 
-    // onClose={onClose}
-    >
+    <Modal open={seeUserProfile} onClose={() => dispatch(toggleSeeUserProfileModal())}>
       <ModalDialog
         sx={{
           maxWidth: "400px",
@@ -36,25 +31,25 @@ const UserProfileModal = ( ) => {
         <Stack spacing={2} alignItems="flex-start">
           {/* Profile Picture */}
           <Avatar
-            src={user.profilePic}
-            alt={user.name}
+            src={userProfileData.avtar}
+            alt={userProfileData.fullname}
             sx={{ width: 80, height: 80, mb: 2 }}
           />
 
           {/* Name and Username */}
           <Box>
             <Typography level="h5" sx={{ fontWeight: "bold" }}>
-              {user.name}
+              {userProfileData.fullname}
             </Typography>
             <Typography level="body-sm" sx={{ color: "text.secondary" }}>
-              @{user.username}
+              @{userProfileData.username}
             </Typography>
           </Box>
 
           {/* About Section */}
           <Box>
             <Typography level="body-sm" sx={{ color: "text.primary" }}>
-              {user.about}
+              {userProfileData.bio||""}
             </Typography>
           </Box>
 
@@ -63,23 +58,11 @@ const UserProfileModal = ( ) => {
 
           {/* Additional Info (e.g., Join Date) */}
           <Typography level="body-sm" sx={{ color: "text.tertiary" }}>
-            Joined on {user.joinDate}
+            Joined on { moment(userProfileData.createdAt).format("DD MMM YYYY")}
           </Typography>
 
           {/* Action Buttons */}
-          <Stack direction="row" spacing={2} sx={{ width: "100%", mt: 2 }}>
-            <Button
-              variant="outlined"
-              color="neutral"
-              fullWidth
-            //   onClick={onClose}
-            >
-              Close
-            </Button>
-            <Button variant="solid" color="primary" fullWidth>
-              Message
-            </Button>
-          </Stack>
+
         </Stack>
       </ModalDialog>
     </Modal>

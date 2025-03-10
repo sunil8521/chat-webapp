@@ -4,16 +4,28 @@ const modalSlice = createSlice({
   name: "MODAL",
   initialState: {
     findFriends: false,
-    notifications:false
+    notifications:false,
+    seeUserProfile:false,
+    userProfileData:{}
+
   },
   reducers: {
     toggleFindFriendsModal: (state) => {
       state.findFriends = !state.findFriends;
     },
-    toggleNotofocationModal: (sate) => {
-      sate.notifications = !sate.notifications;
+    toggleNotofocationModal: (state) => {
+      state.notifications = !state.notifications;
     },
+    toggleSeeUserProfileModal: (state) => {
+      state.seeUserProfile = !state.seeUserProfile;
+    },
+    setUserProfileData: (state,{payload}) => {
+      
+      state.userProfileData = payload
+    },
+
+
   },
 });
-export const {toggleFindFriendsModal,toggleNotofocationModal} =modalSlice.actions
+export const {toggleFindFriendsModal,toggleNotofocationModal,toggleSeeUserProfileModal,setUserProfileData} =modalSlice.actions
 export default modalSlice;

@@ -262,7 +262,7 @@ export const getMembers = errorHandler(async (req, res, next) => {
   const members = await chatModel.findById(chatId).populate({
     path: "participants",
     model: userModel,
-    select: "fullname avtar username",
+    select: "fullname avtar username createdAt",
   });
 
   res.status(200).json({ success: true, members });

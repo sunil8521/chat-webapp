@@ -9,11 +9,17 @@ import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRound
 import PhoneInTalkRoundedIcon from "@mui/icons-material/PhoneInTalkRounded";
 import MoreVertRoundedIcon from "@mui/icons-material/MoreVertRounded";
 import { toggleMessagesPane } from "../../utils";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import {toggleSeeUserProfileModal,setUserProfileData} from "../redux/reducer/modal"
 import UserProfileModal from "../pages/UserProfileModal";
 export default function MessagesPaneHeader({ sender }) {
   const { online_users } = useSelector((state) => state.ONLINEUSER);
-  const getDetails = () => {};
+  const dispatch=useDispatch()
+  const getDetails = () => {
+    dispatch(setUserProfileData(sender))
+    dispatch(toggleSeeUserProfileModal())
+    
+  };
   const online = online_users.includes(sender?._id);
   return (
     <Stack
