@@ -5,7 +5,7 @@ import { tokenProvider, cookieOption } from "../helpers/TokenProvider.js";
 import chatModel from "../schema/Chat.js";
 import messageModel from "../schema/Message.js";
 import { Emit } from "../helpers/EventEmit.js";
-import {UploadToCloudnary} from "../helpers/imageConfig.js"
+import { UploadToCloudnary } from "../helpers/imageConfig.js";
 
 export const signUp = errorHandler(async (req, res, next) => {
   const newUser = await userModel.create(req.body);
@@ -31,10 +31,10 @@ export const getMe = (req, res, next) => {
   res.json(req.user);
 };
 
-export const updateProfile=errorHandler(async(req,res,next)=>{
-  const updateData = {}; 
-
+export const updateProfile = errorHandler(async (req, res, next) => {
+  const updateData = {};
   if (req.file) {
+    console.log("send a request to cloud");
     const uploadResults = await UploadToCloudnary([req.file]);
     updateData.avtar = uploadResults[0].secure_url;
   }
@@ -43,19 +43,58 @@ export const updateProfile=errorHandler(async(req,res,next)=>{
   if (req.body.fullname) updateData.fullname = req.body.fullname;
   if (req.body.email) updateData.email = req.body.email;
 
-    const updatedUser = await userModel.findByIdAndUpdate(
-      req.user._id, 
-      updateData, 
-      { new: true, runValidators: true } 
-    );
-    if (!updatedUser) {
-      return res.status(404).json({ message: "User not found" });
-    }
-  
-  res.status(200).json({ success: true, message: "Profile upadated successfully" });
+  const updatedUser = await userModel.findByIdAndUpdate(
+    req.user._id,
+    updateData,
+    { new: true, runValidators: true }
+  );
 
+  if (!updatedUser) {
+    return res.status(404).json({ message: "User not found" });
+  }
 
-})
+  res
+    .status(200)
+    .json({ success: true, message: "Profile upadated successfully" });
+});
+
+export const updateBio = errorHandler(async (req, res, next) => {
+  const bio = req.body.bio;
+  const updatedUser = await userModel.findByIdAndUpdate(
+    req.user._id,
+    { bio: bio },
+    { new: true, runValidators: true }
+  );
+
+  if (!updatedUser) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  res.status(200).json({ success: true, message: "Bio upadated successfully" });
+});
+
+export const updatePassword = errorHandler(async (req, res, next) => {
+  const { previousPassword, newPassword } = req.body;
+  if (!previousPassword || !newPassword) {
+    return next(new CustomError("Both fields are required.", 400));
+  }
+if(previousPassword==newPassword){
+  return next(new CustomError("You can not use same password.", 400));
+
+}
+
+  const user = await userModel.findById(req.user._id).select("+password");
+  if (!user) {
+    return next(new CustomError("User not found.", 404));
+  }
+  const isMatch = await user.Checkpassword(previousPassword, user.password);
+  if (!isMatch) {
+    return next(new CustomError("Incorrect previous password.", 401));
+  }
+  user.password = newPassword;
+  await user.save();
+  res.status(200).json({ message: "Password updated successfully." });
+});
 
 export const logout = (req, res, next) => {
   res
@@ -104,24 +143,23 @@ export const handleRequest = errorHandler(async (req, res, next) => {
     model: userModel,
     select: "fullname avtar",
   });
-  const data={
-    type:"notification_status",
-    payload:{
-      fullname:request.fromuserid.fullname,
-      avtar:request.fromuserid.avtar,
-      status
-    }
-  }
+  const data = {
+    type: "notification_status",
+    payload: {
+      fullname: request.fromuserid.fullname,
+      avtar: request.fromuserid.avtar,
+      status,
+    },
+  };
   if (!request) {
     return next(new CustomError("Request not found.", 404));
   }
   if (status === "accept") {
-    
     await chatModel.create({
       participants: [request.fromuserid._id, request.touserid],
     });
     await requestModel.findByIdAndDelete(requestid);
-    Emit([request.fromuserid._id.toString()],data) //emit the event
+    Emit([request.fromuserid._id.toString()], data); //emit the event
     return res.status(200).json({
       success: true,
       message: "Friend request accepted. Chat created.",
@@ -130,14 +168,13 @@ export const handleRequest = errorHandler(async (req, res, next) => {
 
   if (status === "reject") {
     await requestModel.findByIdAndDelete(requestid);
-    Emit([request.fromuserid._id.toString()],data) //emit the event
+    Emit([request.fromuserid._id.toString()], data); //emit the event
 
     return res.status(200).json({
       success: true,
       message: "Friend request rejected.",
     });
   }
-
 });
 
 export const myfrinendRequest = errorHandler(async (req, res, next) => {
@@ -152,6 +189,7 @@ export const myfrinendRequest = errorHandler(async (req, res, next) => {
     });
   res.status(200).json({ success: true, requests });
 });
+
 export const findFriends = errorHandler(async (req, res, next) => {
   const yourUserId = req.user._id;
 

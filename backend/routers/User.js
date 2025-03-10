@@ -1,4 +1,4 @@
-import {signIn,signUp,getMe,sendRequest,handleRequest,findFriends,findMyMessages,logout,getMembers,searchUser,myfrinendRequest,updateProfile} from "../functions/User.js"
+import {signIn,signUp,getMe,sendRequest,handleRequest,findFriends,findMyMessages,logout,getMembers,searchUser,myfrinendRequest,updateProfile,updateBio,updatePassword} from "../functions/User.js"
 import { Router } from "express"
 import { protector } from "../helpers/Protector.js"
 import chatModel from "../schema/Chat.js"
@@ -11,6 +11,8 @@ userRoutes.get("/logout",logout)
 userRoutes.use(protector)
 userRoutes.get("/me",getMe)
 userRoutes.patch("/updateProfile",uploadMultiple,updateProfile)
+userRoutes.patch("/updateBio",updateBio)
+userRoutes.patch("/updatePassword",updatePassword)
 
 userRoutes.post("/sendrequest",sendRequest)
 userRoutes.post("/handlerequest",handleRequest)
