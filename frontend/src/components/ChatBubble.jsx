@@ -49,7 +49,7 @@ const attachment=false
             </Avatar>
             <div>
               <Typography sx={{ fontSize: 'sm' }}>{attachment.fileName}</Typography>
-              <Typography level="body-sm">{attachment.size}</Typography>
+              <Typography level="body-sm">{attachment.fileSize}</Typography>
             </div>
           </Stack>
         </Sheet>

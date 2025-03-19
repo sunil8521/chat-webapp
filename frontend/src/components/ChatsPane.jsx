@@ -79,9 +79,7 @@ export default function ChatsPane(props) {
           Messages
         </Typography>
 
-
-
-        <SearchUserAndNotification  display={{xs:"none",sm:"flex"}}/>
+        <SearchUserAndNotification display={{ xs: "none", sm: "flex" }} />
 
         <IconButton
           variant="plain"

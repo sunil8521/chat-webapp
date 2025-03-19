@@ -16,14 +16,12 @@ const broadcastOnlineUsers = () => {
     }
   });
 };
+
 const websocketServer = (server) => {
   const wss = new WebSocketServer({ server });
 
   wss.on("connection", async function connection(ws, req) {
     const userId = req.headers["sec-websocket-protocol"];
-
-    // users.set(userId, ws);
-
     try {
       const user = await userModel.findById(userId);
       if (!user) {
@@ -40,24 +38,13 @@ const websocketServer = (server) => {
     ws.on("message", async function incoming(message) {
       const { message: data } = JSON.parse(message);
 
-      // if (data.type === "friendrequest") {
-      //   const socketUser = users.get(data.payload.id);
-      //   if (socketUser) {
-      //     socketUser.send(
-      //       JSON.stringify({
-      //         type: "notification",
-      //         payload: {
-      //           id: data.payload.id,
-      //           avtar: data.payload.avtar,
-      //           fullname: data.payload.fullname,
-      //         },
-      //       })
-      //     );
-      //   }
-      // }
+
+
+
+
+
       if (data.type === "message") {
         const { chatid, senderid, content, members } = data.payload;
-
         const memberSocket = members
           .map((id) => users.get(id))
           .filter((ws) => ws !== undefined);
@@ -87,22 +74,7 @@ const websocketServer = (server) => {
           );
         }); // this helps to send message
 
-        // try{
-        //   const newMessage=await messageModel.create({
-        //     chatid:chatid,
-        //     senderid:senderid._id,
-        //     content:content
-        //   });
-        //   await chatModel.findByIdAndUpdate(chatid,{
-        //     lastmessage:newMessage._id
-        //   },{new:true})
-        // }catch(dbError){
-        //   console.error("Database error:", dbError);
-        //   ws.send(JSON.stringify({
-        //     type: "error",
-        //    message: `Failed to save message, Server error`
-        //   }));
-        // }
+        //TODO- write here save to server
       }
     });
 
@@ -116,3 +88,20 @@ const websocketServer = (server) => {
 };
 
 export default websocketServer;
+
+// try{
+//   const newMessage=await messageModel.create({
+//     chatid:chatid,
+//     senderid:senderid._id,
+//     content:content
+//   });
+//   await chatModel.findByIdAndUpdate(chatid,{
+//     lastmessage:newMessage._id
+//   },{new:true})
+// }catch(dbError){
+//   console.error("Database error:", dbError);
+//   ws.send(JSON.stringify({
+//     type: "error",
+//    message: `Failed to save message, Server error`
+//   }));
+// }

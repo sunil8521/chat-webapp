@@ -4,7 +4,7 @@ import Sheet from "@mui/joy/Sheet";
 import CircularProgress from "@mui/joy/CircularProgress";
 import Stack from "@mui/joy/Stack";
 import { useParams } from "react-router-dom";
-import MiniLoader from "../../shared/MiniLoader"
+import MiniLoader from "../../shared/MiniLoader";
 import ChatBubble from "../../components/ChatBubble";
 import MessageInput from "../../components/MessageInput";
 import MessagesPaneHeader from "../../components/MessagesPaneHeader";
@@ -13,8 +13,9 @@ import { useChatMembersQuery, useChatMessagesQuery } from "../../redux/api";
 import { useGlobalVar } from "../../context/ContextUse";
 import MessageLayouts from "../../components/Layouts/MessageLayout";
 
+
 const MessagesPane = () => {
-  const { ws } = useGlobalVar();
+  const { ws,peer } = useGlobalVar();
   const { user } = useSelector((s) => s.AUTH);
   const { id } = useParams();
 
@@ -105,7 +106,7 @@ const MessagesPane = () => {
   useEffect(() => {
     if (!ws) return;
 
-    const handleMessage = (event) => {
+    const handleMessage = async(event) => {
       const newMessage = JSON.parse(event.data);
       if (
         newMessage.type === "new_message" &&
@@ -180,6 +181,7 @@ const MessagesPane = () => {
       }}
     >
       <MessagesPaneHeader sender={sender} />
+
       <Box
         ref={messagesContainerRef}
         sx={{
@@ -193,9 +195,7 @@ const MessagesPane = () => {
         }}
       >
         <Stack spacing={2} sx={{ justifyContent: "flex-end" }}>
-          {messageIsFetching && (
-          <MiniLoader/>
-          )}
+          {messageIsFetching && <MiniLoader />}
           {allMessages?.map((message, index) => {
             const isYou =
               message.senderid._id.toString() === user._id.toString();

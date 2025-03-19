@@ -1,17 +1,33 @@
 import { createContext, useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import { useSelector,useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import toast from "react-hot-toast";
-import {setOnlineUser} from "../redux/reducer/online_user"
+import { setOnlineUser } from "../redux/reducer/online_user";
 export const Global_var = createContext();
 
 export const Global_var_provider = ({ children }) => {
-  const dispatch=useDispatch()
+
+  const dispatch = useDispatch();
   const [ws, setWs] = useState(null);
   const { user } = useSelector((state) => state.AUTH);
 
-  useEffect(() => {
+  const peer = new RTCPeerConnection({
+    iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+  });
 
+  const dataChannel = peer.createDataChannel("fileTransfer");
+
+  dataChannel.onopen = () => {
+    console.log("WebRTC Data Channel Open");
+  };
+
+  dataChannel.onclose = () => {
+    console.log("WebRTC Data Channel Closed");
+  };
+  dataChannel.onerror = (error) => {
+    console.error("WebRTC Data Channel Error:", error);
+  };
+  useEffect(() => {
     if (!user._id) return;
 
     let socket = new WebSocket(import.meta.env.VITE_WSURL, [user._id]);
@@ -20,27 +36,21 @@ export const Global_var_provider = ({ children }) => {
       console.log("WebSocket connection established");
     };
 
-    socket.onmessage=(event)=>{
-      const data=JSON.parse(event.data)
-      if(data.type=="error"){
-        toast.error(`${data.message}`)
-      }else if(data.type=="online_users"){
-        dispatch(setOnlineUser(data.users))
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type == "error") {
+        toast.error(`${data.message}`);
+      } else if (data.type == "online_users") {
+        dispatch(setOnlineUser(data.users));
       }
-    }
-    
+    };
+
     socket.onerror = (error) => {
       toast.error("Server error: Failed to connet socket");
-
     };
 
     socket.onclose = () => {
       console.log("WebSocket connection closed");
-      // setTimeout(() => {
-      //   socket=new WebSocket("ws://127.0.0.1:8080", [user._id])
-      //   setWs(socket);
-      //   console.log("WebSocket connection reestablish");
-      // }, 3000);
     };
 
     setWs(socket);
@@ -49,9 +59,11 @@ export const Global_var_provider = ({ children }) => {
         socket.close();
       }
     };
-  }, [user,dispatch]);
+  }, [user, dispatch]);
 
-  return <Global_var.Provider value={{ ws }}>{children}</Global_var.Provider>;
+  return (
+    <Global_var.Provider value={{ ws, peer }}>{children}</Global_var.Provider>
+  );
 };
 
 Global_var_provider.propTypes = {
