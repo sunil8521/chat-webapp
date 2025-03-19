@@ -3,7 +3,7 @@ import "dotenv/config";
 export const cookieOption = {
   maxAge: 24 * 60 * 60 * 1000,
   httpOnly: true,
-  // sameSite: "Strict",
+  sameSite: "Strict",
   sameSite: "None",
   secure: true,
 };

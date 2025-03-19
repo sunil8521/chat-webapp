@@ -17,7 +17,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 app.use(express.json());
 app.use(CookieParser());
-// app.use(express.static(path.join(__dirname,"../real_time/dist")));
+app.use(express.static(path.join(__dirname, "../frontend/dist")));
 imageUploader.config({
   cloud_name: process.env.CLOUDINARY_NAME,
   api_key: process.env.API_KEY,
@@ -33,7 +33,7 @@ app.use(
     ],
     credentials: true,
   })
-);
+); // do not use when prodcution
 
 async function Database() {
   try {
@@ -51,12 +51,11 @@ const expressServer = app.listen(8080, () =>
   console.log("Express server running on port 8080")
 );
 
-
 websocketServer(expressServer);
 
 app.use("/api/user", userRoutes);
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../real_time/dist", "index.html"));
+  res.sendFile(path.join(__dirname, "../frontend/dist", "index.html"));
 });
 
 app.all("*", (req, res, next) => {
