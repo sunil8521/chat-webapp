@@ -163,7 +163,7 @@ function MyProfile() {
                 <AspectRatio
                   ratio="1"
                   maxHeight={200}
-                  sx={{ flex: 1, minWidth: 120, borderRadius: "100%" }}
+                  sx={{ flex: 1, minWidth: { xs: 100, sm: 120 }, borderRadius: "100%" }}
                 >
                   <img src={selectedImage} alt="Profile" />
                 </AspectRatio>
@@ -185,8 +185,8 @@ function MyProfile() {
                     position: "absolute",
                     zIndex: 2,
                     borderRadius: "50%",
-                    left: 100,
-                    top: 170,
+                    left: { xs: 80, sm: 100 },
+                    top: { xs: 190, sm: 180 },
                     boxShadow: "sm",
                   }}
                 >
