@@ -24,7 +24,7 @@ import ModalClose from "@mui/joy/ModalClose";
 import Sheet from "@mui/joy/Sheet";
 import Typography from "@mui/joy/Typography";
 import axios from "axios";
-import { useEffect, useState,memo } from "react";
+import { useEffect, useState, memo } from "react";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
@@ -47,7 +47,7 @@ import {
 import { useGlobalVar } from "../context/ContextUse";
 import { handleNotificationsCount } from "../redux/reducer/notification";
 
- function Sidebar() {
+function Sidebar() {
   const { ws } = useGlobalVar();
   const location = useLocation();
   const { user } = useSelector((state) => state.AUTH);
@@ -116,7 +116,7 @@ import { handleNotificationsCount } from "../redux/reducer/notification";
     return () => {
       ws.removeEventListener("message", handleMessage);
     };
-  }, [ws,refetch,dispatch]);
+  }, [ws, refetch, dispatch]);
 
   const handleRequest = async (data) => {
     try {
@@ -183,7 +183,7 @@ import { handleNotificationsCount } from "../redux/reducer/notification";
         <IconButton variant="soft" color="primary" size="sm">
           <BrightnessAutoRoundedIcon />
         </IconButton>
-        <Typography level="title-lg">hul chat</Typography>
+        <Typography level="title-lg">NextChat</Typography>
         <ColorSchemeToggle sx={{ ml: "auto" }} />
       </Box>
 
@@ -250,7 +250,19 @@ import { handleNotificationsCount } from "../redux/reducer/notification";
           <Avatar variant="outlined" size="sm" src={user.avtar} />
           <Box sx={{ minWidth: 0, flex: 1 }}>
             <Typography level="title-sm">{user.fullname}</Typography>
-            <Typography level="body-xs">{user.email}</Typography>
+            <Typography
+              level="body-xs"
+              sx={{
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                maxWidth: "100%", // Adjust as needed
+                display: "inline-block",
+            
+              }}
+            >
+              {user.email}
+            </Typography>
           </Box>
           <IconButton
             size="sm"
@@ -464,4 +476,4 @@ import { handleNotificationsCount } from "../redux/reducer/notification";
     </Sheet>
   );
 }
-export default memo(Sidebar)
+export default memo(Sidebar);

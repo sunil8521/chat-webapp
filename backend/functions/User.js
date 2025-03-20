@@ -34,7 +34,6 @@ export const getMe = (req, res, next) => {
 export const updateProfile = errorHandler(async (req, res, next) => {
   const updateData = {};
   if (req.file) {
-    console.log("send a request to cloud");
     const uploadResults = await UploadToCloudnary([req.file]);
     updateData.avtar = uploadResults[0].secure_url;
   }
@@ -48,14 +47,14 @@ export const updateProfile = errorHandler(async (req, res, next) => {
     updateData,
     { new: true, runValidators: true }
   );
-
+console.log("update in data bse")
   if (!updatedUser) {
     return res.status(404).json({ message: "User not found" });
   }
 
   res
     .status(200)
-    .json({ success: true, message: "Profile upadated successfully" });
+    .json({ success: true, message: "Profile upadated successfully" ,user:updatedUser});
 });
 
 export const updateBio = errorHandler(async (req, res, next) => {

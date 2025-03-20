@@ -22,14 +22,18 @@ import Typography from "@mui/joy/Typography";
 import axios from "axios";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { useSelector } from "react-redux";
+import { useSelector,useDispatch } from "react-redux";
 import LayoutPage from "../../components/Layouts/LayoutPage";
 import toast from "react-hot-toast";
+import {  setUser } from "../../redux/reducer/auth"; 
+
 function MyProfile() {
+  const dispatch = useDispatch();
   const { user } = useSelector((state) => state.AUTH);
   const [selectedImage, setSelectedImage] = useState(user?.avtar || null);
   const [forBackend, setForbackend] = useState(null);
   // Forms
+
   const profileForm = useForm({
     defaultValues: {
       username: user.username,
@@ -77,9 +81,14 @@ function MyProfile() {
       const res = await axios.patch("/api/user/updateProfile", updatedFields, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+
+      // dispatch(setUser(res.data.user))
+      // console.log(res.data.user)
+
       toast.success(res.data.message);
       setForbackend(null);
     } catch (error) {
+      // console.log(error)
       toast.error(error.response?.data.message || "Unable to update profile");
       // console.error("Update failed:", error.response?.data || error.message);
     }
@@ -99,7 +108,7 @@ function MyProfile() {
 
       // console.log(er)
     }
-    console.log("Bio Updated:", data);
+    // console.log("Bio Updated:", data);
   };
 
   const onSubmitPassword = async (data) => {
@@ -109,9 +118,9 @@ function MyProfile() {
           "Content-Type": "application/json",
         },
       });
-      console.log(res.data);
+      // console.log(res.data);
     } catch (er) {
-      console.log(er);
+      // console.log(er);
       toast.error(er.response?.data.message || "Unable to update Bio");
     }
   };
