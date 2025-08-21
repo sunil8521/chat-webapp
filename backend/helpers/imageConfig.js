@@ -42,4 +42,3 @@ export const UploadToCloudnary = async (file) => {
       throw new CustomError(error.message || "An error occurred while uploading files", 500);
     }
   };
-  

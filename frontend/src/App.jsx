@@ -11,16 +11,6 @@ import { deleteUser, setUser } from "./redux/reducer/auth";
 import axios from "axios";
 import Loader from "./shared/Loader";
 import { routes } from "./routes/routes";
-const SignInPage = lazy(() => import("./pages/SignInPage"));
-const SignUpPage = lazy(() => import("./pages/SignUpPage"));
-const LandingPage = lazy(() => import("./pages/LandingPage"));
-const WelcomeMessageWithLayout = lazy(() =>
-  import("./pages/PagesWithLayout/WelcomeMessage")
-);
-const MessagesPaneWithLayout = lazy(() =>
-  import("./pages/PagesWithLayout/MessagesPane")
-);
-const MyProfile = lazy(() => import("./pages/PagesWithLayout/Profile"));
 
 
 

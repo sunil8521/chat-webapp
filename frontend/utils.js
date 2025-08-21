@@ -45,8 +45,11 @@ export function openSidebar() {
         .getComputedStyle(document.documentElement)
         .getPropertyValue('--MessagesPane-slideIn');
       if (slideIn) {
+        console.log("yes");
+        
         closeMessagesPane();
       } else {
+        console.log("no");
         openMessagesPane();
       }
     }

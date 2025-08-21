@@ -26,6 +26,7 @@ import { useSelector,useDispatch } from "react-redux";
 import LayoutPage from "../../components/Layouts/LayoutPage";
 import toast from "react-hot-toast";
 import {  setUser } from "../../redux/reducer/auth"; 
+import MessageLayouts from "../../components/Layouts/MessageLayout";
 
 function MyProfile() {
   const dispatch = useDispatch();
@@ -119,6 +120,7 @@ function MyProfile() {
         },
       });
       // console.log(res.data);
+      toast.success(res.data.message);
     } catch (er) {
       // console.log(er);
       toast.error(er.response?.data.message || "Unable to update Bio");
@@ -136,7 +138,7 @@ function MyProfile() {
         display: "flex",
         flexDirection: "column",
         minWidth: 0,
-        height: "100dvh",
+                height: { xs: "calc(100dvh - var(--Header-height))", md: "100dvh" },
         gap: 1,
         overflow: "auto",
       }}
@@ -359,5 +361,7 @@ function MyProfile() {
     </Box>
   );
 }
-const ProfileWithLayout = LayoutPage(MyProfile);
+// const ProfileWithLayout = LayoutPage(MyProfile);
+const ProfileWithLayout = MessageLayouts(MyProfile);
+// const MessagesPaneWithLayout = MessageLayouts(MessagesPane);
 export default ProfileWithLayout;

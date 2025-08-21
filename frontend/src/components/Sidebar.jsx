@@ -59,6 +59,7 @@ function Sidebar() {
     isFetching: friendRequestLoading,
     isError: friendRequestError,
   } = useGetFrindRequestQuery();
+  
   useEffect(() => {
     setFriendRequest(friendRequestData?.requests);
   }, [friendRequestData]);
@@ -136,7 +137,7 @@ function Sidebar() {
           md: "none",
         },
         transition: "transform 0.4s, width 0.4s",
-        zIndex: 10000,
+        zIndex: 9997,
         height: "100dvh",
         width: "var(--Sidebar-width)",
         top: 0,
@@ -167,7 +168,7 @@ function Sidebar() {
           top: 0,
           left: 0,
           width: "100vw",
-          height: "100vh",
+          height: "100dvh",
           opacity: "var(--SideNavigation-slideIn)",
           backgroundColor: "var(--joy-palette-background-backdrop)",
           transition: "opacity 0.4s",
@@ -229,6 +230,8 @@ function Sidebar() {
               </ListItemContent>
             </ListItemButton>
           </ListItem>
+
+
           <ListItem>
             <ListItemButton
               selected={location.pathname.includes("profile")}
@@ -473,6 +476,8 @@ function Sidebar() {
           </Box>
         </Sheet>
       </Modal>
+
+      
     </Sheet>
   );
 }
