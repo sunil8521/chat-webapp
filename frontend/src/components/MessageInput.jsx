@@ -114,6 +114,9 @@ export default function MessageInput({ payload }) {
         });
       };
 
+
+
+      
       dataChannel.current.onclose = () => {
         console.log("Data channel closed");
         toast("File transfer channel closed", {
