@@ -25,9 +25,10 @@ import PropTypes from "prop-types";
 
 export default function MessageInput({ payload }) {
   const { online_users } = useSelector((state) => state.ONLINEUSER);
-  console.log(online_users);
   const { ws, peer } = useGlobalVar();
   const { handleSubmit, register, reset, getValues, setValue } = useForm();
+  const [fileTransferInProgress, setFileTransferInProgress] = useState(false);
+  const [fileTransferChannel, setFileTransferChannel] = useState(false);
   const fileInputRef = useRef(null);
   const currentFile = useRef(null);
   const [fileName, setFileName] = useState(null);
@@ -38,14 +39,18 @@ export default function MessageInput({ payload }) {
 
   const onSubmit = (data) => {
     if (data.message.trim() == "" && fileName === null) return;
-    console.log("data");
 
     if (fileName) {
-if (dataChannel.readyState === "open") {
-  dataChannel.send("Hello! This is a simple text message.");
-} else {
-  console.warn("Data channel is not open yet");
-}    }
+      if (dataChannel.current && dataChannel.current.readyState === "open") {
+        dataChannel.current.send("Hello! This is a simple text message.");
+      } else {
+        console.warn(
+          "Data channel is not open yet. State:",
+          dataChannel.current?.readyState
+        );
+        toast.error("File transfer channel is not open yet.");
+      }
+    }
     if (!(data.message.trim() == "")) {
       const message = {
         type: "message",
@@ -90,18 +95,31 @@ if (dataChannel.readyState === "open") {
         })
       );
       if (dataChannel.current && dataChannel.current.readyState !== "closed") {
-        console.warn("File transfer already in progress");
         return;
       }
 
+      setFileTransferChannel(true);
+      const Tid = toast.loading("Opening file transfer channel...");
       dataChannel.current = peer.createDataChannel("fileTransfer");
       dataChannel.current.binaryType = "arraybuffer";
+      dataChannel.current.onerror = (error) => {
+        console.error("Data channel error:", error);
+      };
+
       dataChannel.current.onopen = () => {
         console.log("Data channel opened");
+        setFileTransferChannel(false);
+        toast.success("File transfer channel opened", {
+          id: Tid,
+        });
       };
 
       dataChannel.current.onclose = () => {
         console.log("Data channel closed");
+        toast("File transfer channel closed", {
+          icon: "⚠️",
+        });
+        setFileTransferChannel(false);
       };
 
       peer.onicecandidate = (event) => {
@@ -232,6 +250,7 @@ if (dataChannel.readyState === "open") {
                   color="primary"
                   sx={{ alignSelf: "center", borderRadius: "sm" }}
                   endDecorator={<SendRoundedIcon />}
+                  disabled={fileTransferChannel}
                 >
                   Send
                 </Button>
