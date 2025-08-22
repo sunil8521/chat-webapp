@@ -177,7 +177,6 @@ export const handleRequest = errorHandler(async (req, res, next) => {
 });
 
 export const myfrinendRequest = errorHandler(async (req, res, next) => {
-  console.log(req.user._id);
   const requests = await requestModel
     .find({
       touserid: req.user._id,

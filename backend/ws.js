@@ -37,11 +37,36 @@ const websocketServer = (server) => {
 
     ws.on("message", async function incoming(message) {
       const { message: data } = JSON.parse(message);
+      if (data.type === "file-details") {
+        const {details,from,to}=data.payload
+        const Socket=users.get(to);
+        if(Socket && Socket.readyState===Socket.OPEN){
+          Socket.send(JSON.stringify({
+            type:"file-details",
+            payload:{
+              details,
+              from,
+              to
+            }
+          }))
+        }
+      }
+      if(["offer","answer","ice-candidate"].includes(data.type)){
+        const {webRtcData,from,to}=data.payload
+        const Socket=users.get(to);
+        
+        if(Socket && Socket.readyState===Socket.OPEN){
+          Socket.send(JSON.stringify({
+            type:data.type,
+            payload:{
+              webRtcData,
+              from,
+              to
+            }
+          }))
+        }
 
-
-
-
-
+      }
 
       if (data.type === "message") {
         const { chatid, senderid, content, members } = data.payload;

@@ -114,6 +114,9 @@ const MessagesPane = () => {
       ) {
         setRealTimeMessages((prev) => [...prev, newMessage.payload]);
       }
+      // if (newMessage.type === "file-details") {
+      //   console.log("file")
+      // }
     };
 
     ws.addEventListener("message", handleMessage);
