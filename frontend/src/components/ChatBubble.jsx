@@ -8,9 +8,9 @@ import Typography from "@mui/joy/Typography";
 import CelebrationOutlinedIcon from "@mui/icons-material/CelebrationOutlined";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import InsertDriveFileRoundedIcon from "@mui/icons-material/InsertDriveFileRounded";
-import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
+import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 export default function ChatBubble(props) {
-  const { content, variant, createdAt, senderid, isMessage } = props;
+  const { content, variant, createdAt, senderid, isMessage,isAttachment } = props;
   const isSent = variant === "sent";
   const date = new Date(createdAt);
   const formattedDate = date.toLocaleString("en-US", {
@@ -22,10 +22,10 @@ export default function ChatBubble(props) {
 
   // const attachment=false
   const attachment = {
-    fileName: "hul.pdf",
+    fileUrl:"https://example.com/l.pdf",
+    fileName: "l.pdf",
     fileSize: "15mb",
   };
-  const isAttachment = true;
   return (
     <Box sx={{ maxWidth: "60%", minWidth: "auto" }}>
       <Stack
@@ -33,45 +33,70 @@ export default function ChatBubble(props) {
         spacing={2}
         sx={{ justifyContent: "space-between", mb: 0.25 }}
       >
-        <Typography level="body-xs">
+        <Typography
+          level="body-xs"
+          sx={{ wordBreak: "break-all", overflowWrap: "anywhere" }}
+        >
           {isSent ? "You" : senderid.fullname}
         </Typography>
         <Typography level="body-xs">{formattedDate}</Typography>
       </Stack>
 
-      {isAttachment === true && (
-        <Sheet
-          variant="outlined"
-          sx={[
-            {
-              px: 1.75,
-              py: 1.25,
-              borderRadius: "lg",
-            },
-            isSent
-              ? { borderTopRightRadius: 0 }
-              : { borderTopRightRadius: "lg" },
-            isSent ? { borderTopLeftRadius: "lg" } : { borderTopLeftRadius: 0 },
-          ]}
-        >
-          <Stack direction="row" spacing={1.5} sx={{ alignItems: "center" }}>
-            {/* <Avatar color="primary" size="lg"> */}
-              <a href="https://google.com" target="_blank" rel="noreferrer" >
-              
+      {isAttachment && (
+        <>
+          <Sheet
+            variant="outlined"
+            sx={[
+              {
+                px: 1.75,
+                py: 1.25,
+                borderRadius: "lg",
+              },
+              isSent ? { borderTopRightRadius: 0 } : { borderTopLeftRadius: 0 },
+            ]}
+          >
+            <Stack direction="row" spacing={1.5} sx={{ alignItems: "center" }}>
+              <IconButton
+                color="primary"
+                variant="soft"
+                size="lg"
+                sx={{ borderRadius: "50%" }}
+                component="a"
+                href={attachment.fileUrl}
+                target="_blank"
+                rel="noreferrer"
+              >
                 <CloudDownloadIcon />
-              </a>
-            {/* </Avatar> */}
-            <div>
-              <Typography sx={{ fontSize: "sm" }}>
-                {attachment.fileName}
-              </Typography>
-              <Typography level="body-sm">{attachment.fileSize}</Typography>
-            </div>
-          </Stack>
-        </Sheet>
+              </IconButton>
+              <div>
+                <Typography
+                  sx={{
+                    fontSize: "sm",
+                    wordBreak: "break-all",
+                    overflowWrap: "anywhere",
+                  }}
+                >
+                  {attachment.fileName}
+                </Typography>
+                <Typography level="body-sm">{attachment.fileSize}</Typography>
+              </div>
+            </Stack>
+          </Sheet>
+
+          <Typography
+            level="body-xs"
+            sx={{
+              mt: 0.5,
+              fontStyle: "italic",
+              color: "text.secondary",
+            }}
+          >
+            Temporary file. Download if you want to keep it.
+          </Typography>
+        </>
       )}
 
-      {isMessage === true && (
+      {isMessage && (
         <Box sx={{ position: "relative" }}>
           <Sheet
             color={isSent ? "primary" : "neutral"}
@@ -84,13 +109,6 @@ export default function ChatBubble(props) {
               isSent
                 ? {
                     borderTopRightRadius: 0,
-                  }
-                : {
-                    borderTopRightRadius: "lg",
-                  },
-              isSent
-                ? {
-                    borderTopLeftRadius: "lg",
                   }
                 : {
                     borderTopLeftRadius: 0,
@@ -108,8 +126,8 @@ export default function ChatBubble(props) {
               level="body-sm"
               sx={[
                 {
-                  wordBreak: "break-word",
-                  overflowWrap: "break-word",
+                  wordBreak: "break-all",
+                  overflowWrap: "anywhere",
                 },
                 isSent
                   ? {

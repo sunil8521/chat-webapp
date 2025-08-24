@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { useSelector, useDispatch } from "react-redux";
 import toast from "react-hot-toast";
 import { setOnlineUser } from "../redux/reducer/online_user";
+import {addRealTimeMessage} from "../redux/reducer/realTimeMessagesSlice";
 export const Global_var = createContext();
 
 export const Global_var_provider = ({ children }) => {
@@ -27,6 +28,7 @@ export const Global_var_provider = ({ children }) => {
    peerConnection.ondatachannel = (event) => {
       const receiveChannel = event.channel;
       let offset = 0;
+      let progressPercentage=0
       receiveChannel.binaryType = "arraybuffer";
 
       receiveChannel.onmessage = async (event) => {
@@ -41,10 +43,9 @@ export const Global_var_provider = ({ children }) => {
 
         reciveSizeRef.current = reciveSizeRef.current + buf.byteLength;
         offset+=buf.byteLength;
-        // setReceiveProgress(Math.floor(( offset/ fileDetails.current.size) * 100));
 
         // show progress bar
-  const progressPercentage = Math.floor((offset / fileDetails.current.size) * 100);
+   progressPercentage = Math.floor((offset / fileDetails.current.size) * 100);
         toast.loading(`File receiving: ${progressPercentage}%`, {
           id: `file-progress-${fileDetails.current.name}`,
           duration: Infinity
@@ -64,14 +65,15 @@ export const Global_var_provider = ({ children }) => {
 
           console.log("File received:", download);
 
+
           // setReciveFile((e) => [
           //   ...e,
           //   { href: download, name: fileDetails.current?.name  },
           // ]); // this thing use to show in message sfter user recive all 
-
+toast.success(`File received: ${fileDetails.current.name}`, { duration: 4000 });
           reciveSizeRef.current = 0;
           reciveArry.current = [];
-          // setReceiveProgress(0)
+          progressPercentage=0;
 
 
         }
@@ -79,8 +81,16 @@ export const Global_var_provider = ({ children }) => {
 
     
 
-      receiveChannel.onclose = () =>
+      receiveChannel.onclose = () =>{
         console.log("Data channel closed on receiver");
+      
+         reciveSizeRef.current = 0;
+          reciveArry.current = [];
+          progressPercentage=0;
+                    toast.dismiss(`file-progress-${fileDetails.current.name}`);
+
+}
+
 
       receiveChannel.onopen = () => {
         if (receiveChannel) {
@@ -149,12 +159,6 @@ export const Global_var_provider = ({ children }) => {
         await peerConnection.setRemoteDescription(
           new RTCSessionDescription(data.payload.webRtcData)
         );
-        // if (peerConnection.signalingState !== "stable") {
-        // } else {
-        //   console.warn(
-        //     "Peer is already in stable state, skipping setRemoteDescription for answer."
-        //   );
-        // }
         iceQueue.current.forEach(async (candidate) => {
           await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
         });
@@ -166,7 +170,13 @@ export const Global_var_provider = ({ children }) => {
         } else {
           iceQueue.current.push(data.payload.webRtcData);
         }
+      } else if (data.type === "new_message") {
+        dispatch(addRealTimeMessage({
+          chatId: data.payload.chatid,
+          message: data.payload
+        }));
       }
+
     };
 
     socket.onerror = (error) => {

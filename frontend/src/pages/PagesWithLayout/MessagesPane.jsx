@@ -9,7 +9,11 @@ import MiniLoader from "../../shared/MiniLoader";
 import ChatBubble from "../../components/ChatBubble";
 import MessageInput from "../../components/MessageInput";
 import MessagesPaneHeader from "../../components/MessagesPaneHeader";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  setRealTimeMessages,
+  addRealTimeMessage,
+} from "../../redux/reducer/RealTimeMessages";
 import { useChatMembersQuery, useChatMessagesQuery } from "../../redux/api";
 import { useGlobalVar } from "../../context/ContextUse";
 import MessageLayouts from "../../components/Layouts/MessageLayout";
@@ -17,11 +21,18 @@ import MessageLayouts from "../../components/Layouts/MessageLayout";
 const MessagesPane = () => {
   const { ws, peer } = useGlobalVar();
   const { user } = useSelector((s) => s.AUTH);
+  // const { realTimeMessages } = useSelector((s) => s.REALTIMEMESSAGES);
+  const dispatch = useDispatch();
   const { id } = useParams();
   const navigate = useNavigate();
+  const EMPTY_ARRAY = [];
+
+    const realTime = useSelector(
+    (state) => state.realTimeMessages[id] || EMPTY_ARRAY
+  );
   // Fetch chat members
   const { data, error, isLoading } = useChatMembersQuery(id);
-   useEffect(() => {
+  useEffect(() => {
     if (data && data.members == null) {
       navigate("/home");
     }
@@ -59,15 +70,16 @@ const MessagesPane = () => {
   const debounceTimer = useRef(null);
 
   // Combine messages
-  const allMessages = [...databaseChatMessages, ...realTimeMessages];
+  const allMessages = [...databaseChatMessages, ...realTime];
 
   // Reset state when chat ID changes
   useEffect(() => {
     setDatabaseChatMessages([]);
-    setRealTimeMessages([]);
+    // setRealTimeMessages([]);
+    // dispatch(setRealTimeMessages([]));
     setPage(1);
     setHasMore(true);
-  }, [id]);
+  }, [id, dispatch]);
 
   // Update database messages when new data is fetched
   useEffect(() => {
@@ -117,18 +129,21 @@ const MessagesPane = () => {
         newMessage.type === "new_message" &&
         id.toString() === newMessage.payload.chatid
       ) {
-        setRealTimeMessages((prev) => [...prev, newMessage.payload]);
+        // setRealTimeMessages((prev) => [...prev, newMessage.payload]);
+        dispatch(
+        addRealTimeMessage({
+          chatId: newMessage.payload.chatid,
+          message: newMessage.payload,
+        }))
+        // dispatch(addRealTimeMessage(newMessage.payload));
       }
-      // if (newMessage.type === "file-details") {
-      //   console.log("file")
-      // }
     };
 
     ws.addEventListener("message", handleMessage);
     return () => {
       ws.removeEventListener("message", handleMessage);
     };
-  }, [ws, id]);
+  }, [ws, id, dispatch]);
 
   // Handle scroll for pagination
   const handleScroll = useCallback(() => {
@@ -179,6 +194,7 @@ const MessagesPane = () => {
       if (debounceTimer.current) clearTimeout(debounceTimer.current);
     };
   }, []);
+
   return (
     <Sheet
       sx={{

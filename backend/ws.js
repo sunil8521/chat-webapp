@@ -69,7 +69,7 @@ const websocketServer = (server) => {
       }
 
       if (data.type === "message") {
-        const { chatid, senderid, content, members,isMessage } = data.payload;
+        const { chatid, senderid, content, members,isMessage,isAttachment } = data.payload;
         const memberSocket = members
           .map((id) => users.get(id))
           .filter((ws) => ws !== undefined);
@@ -94,7 +94,8 @@ const websocketServer = (server) => {
                 chatid: chatid,
                 content: content,
                 createdAt: Date.now(),
-                isMessage
+                isMessage,
+                isAttachment
               },
             })
           );

@@ -2,49 +2,47 @@ import Box from "@mui/joy/Box";
 import Button from "@mui/joy/Button";
 import FormControl from "@mui/joy/FormControl";
 import Textarea from "@mui/joy/Textarea";
-import Dropdown from "@mui/joy/Dropdown";
-import Menu from "@mui/joy/Menu";
-import MenuButton from "@mui/joy/MenuButton";
-import MenuItem from "@mui/joy/MenuItem";
 import { IconButton, Stack, Typography, Sheet } from "@mui/joy";
-import ReactMarkdown from "react-markdown";
-import ReactQuill from "react-quill";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
-import FormatBoldRoundedIcon from "@mui/icons-material/FormatBoldRounded";
-import FormatItalicRoundedIcon from "@mui/icons-material/FormatItalicRounded";
-import StrikethroughSRoundedIcon from "@mui/icons-material/StrikethroughSRounded";
-import FormatListBulletedRoundedIcon from "@mui/icons-material/FormatListBulletedRounded";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import { useForm } from "react-hook-form";
 import { useGlobalVar } from "../context/ContextUse";
 import toast from "react-hot-toast";
-import { useState, useRef, useReducer } from "react";
+import { useState, useRef, useReducer, useMemo } from "react";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
-import Snackbar from "@mui/joy/Snackbar";
-import LinearProgress from "@mui/joy/LinearProgress";
+
 export default function MessageInput({ payload }) {
   const { online_users } = useSelector((state) => state.ONLINEUSER);
   const { ws, peer } = useGlobalVar();
   const { handleSubmit, register, reset, getValues, setValue } = useForm();
-  const [fileTransferInProgress, setFileTransferInProgress] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
   const [fileTransferChannel, setFileTransferChannel] = useState(false);
   const fileInputRef = useRef(null);
   const currentFile = useRef(null);
   const [fileName, setFileName] = useState(null);
   const dataChannel = useRef(null);
-  const [open, setOpen] = useState(false);
 
   // to know user is online or not
-  const sender = payload.members?.find((id) => id !== payload.senderid._id);
-  const is_sender_online = online_users?.includes(sender);
+  const sender = useMemo(
+    () => payload.members?.find((id) => id !== payload.senderid._id),
+    [payload.members, payload.senderid._id]
+  );
+  const is_sender_online = useMemo(
+    () => online_users?.includes(sender),
+    [online_users, sender]
+  );
 
   const onSubmit = (data) => {
     if (data.message.trim() == "" && fileName === null) return;
 
     if (fileName) {
+      if (!is_sender_online) {
+        toast.error("User went offline, we cannot send the file.");
+        dataChannel.current.close();
+        dataChannel.current = null;
+        return;
+      }
       if (dataChannel.current && dataChannel.current.readyState === "open") {
         const chunkSize = 16 * 1024;
         dataChannel.current.bufferedAmountLowThreshold = 64 * 1024;
@@ -56,8 +54,6 @@ export default function MessageInput({ payload }) {
 
         // ws.send(JSON.stringify({}));  // send message to user like we send file
 
-        // const Tid = toast.loading("File transfer in progress...",);
-        // setOpen(true);
         reader.onload = async (e) => {
           const result = e.target?.result;
           if (
@@ -92,7 +88,9 @@ export default function MessageInput({ payload }) {
               (offset / currentFile.current.size) * 100
             );
             toast.loading(
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "8px" }}
+              >
                 <span>File sending: {progressPercentage}%</span>
                 <button
                   onClick={() => {
@@ -113,7 +111,7 @@ export default function MessageInput({ payload }) {
                     borderRadius: "4px",
                     padding: "3px 6px",
                     fontSize: "15px",
-                    cursor: "pointer"
+                    cursor: "pointer",
                   }}
                 >
                   Cancel
@@ -132,12 +130,21 @@ export default function MessageInput({ payload }) {
               fileInputRef.current.value = null;
               setFileName(null);
               // setOpen(false);
-          // toast.dismiss(`file-1`);
+              toast.dismiss(`file-1`);
 
-              console.log("File transfer complete!🚀");
+              // console.log("File transfer complete!🚀");
 
-              // toast.success("File transfer complete!", { id: Tid });
-
+              toast.success("File transfer complete!");
+              const message = {
+                type: "message",
+                payload: {
+                  ...payload,
+                  content: null,
+                  isMessage: false,
+                  isAttachment: true,
+                },
+              };
+              dataChannel.current.send(JSON.stringify({ message }));
               if (dataChannel.current) {
                 dataChannel.current.close();
                 dataChannel.current = null;
@@ -164,7 +171,12 @@ export default function MessageInput({ payload }) {
     if (!(data.message.trim() == "")) {
       const message = {
         type: "message",
-        payload: { ...payload, content: data.message.trim(),isMessage:true },
+        payload: {
+          ...payload,
+          content: data.message.trim(),
+          isMessage: true,
+          isAttachment: false,
+        },
       };
 
       if (ws && ws.readyState === WebSocket.OPEN) {
@@ -179,14 +191,15 @@ export default function MessageInput({ payload }) {
   const handleFileChange = async (e) => {
     if (e.target.files[0].size > 10 * 1024 * 1024) {
       toast.error("File size exceeds 10MB");
+      e.target.value = "";
       return;
     }
 
     if (!is_sender_online) {
       toast.error("User is offline, can't send file");
+      e.target.value = "";
       return;
     }
-
     setFileName(e.target.files[0].name);
     currentFile.current = e.target.files[0];
 
@@ -218,16 +231,14 @@ export default function MessageInput({ payload }) {
       dataChannel.current = peer.createDataChannel("fileTransfer");
       dataChannel.current.binaryType = "arraybuffer";
 
-
       dataChannel.current.onerror = (error) => {
         console.error("Data channel error:", error);
         toast.error("File transfer failed");
-        fileInputRef.current.value = null;
+        fileInputRef.current.value = "";
         setFileName(null);
         currentFile.current = null;
 
         setFileTransferChannel(false);
-
       };
 
       dataChannel.current.onopen = () => {
@@ -241,6 +252,9 @@ export default function MessageInput({ payload }) {
         toast("File transfer channel closed", {
           icon: "⚠️",
         });
+        fileInputRef.current.value = "";
+        setFileName(null);
+        currentFile.current = null;
         setFileTransferChannel(false);
       };
 
@@ -286,12 +300,10 @@ export default function MessageInput({ payload }) {
   const handleRemoveFile = () => {
     setFileName(null);
     if (fileInputRef.current) {
-      fileInputRef.current.value = null; // reset input
+      fileInputRef.current.value = ""; // reset input
     }
+    currentFile.current = null;
   };
-
-
-
 
   return (
     <Box sx={{ px: 2, pb: 3 }}>
@@ -390,45 +402,6 @@ export default function MessageInput({ payload }) {
           />
         </FormControl>
       </form>
-
-      <Snackbar
-        sx={{
-          zIndex: 9996,
-        }}
-        open={open}
-        onClose={() => setOpen(false)}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        autoHideDuration={null}
-        variant="outlined"
-      >
-        <Box
-          sx={{ display: "flex", alignItems: "center", gap: 1, minWidth: 280 }}
-        >
-          {/* Progress Bar with % */}
-          <Box sx={{ flexGrow: 1 }}>
-            <Typography level="body-sm" sx={{ mb: 0.5 }}>
-              Uploading... {uploadProgress}%
-            </Typography>
-            <LinearProgress
-              variant="solid"
-              // determinate
-              value={uploadProgress}
-              sx={{ borderRadius: "md", height: 6 }}
-            />
-          </Box>
-
-          {/* Cancel (X) Button */}
-          <Button
-            size="sm"
-            variant="outlined"
-            color="danger"
-            // onClick={cancelUpload}
-            sx={{ minWidth: 32, minHeight: 32, p: 0 }}
-          >
-            ✕
-          </Button>
-        </Box>
-      </Snackbar>
     </Box>
   );
 }

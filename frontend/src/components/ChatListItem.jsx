@@ -65,6 +65,8 @@ export default function ChatListItem({ participants, lastmessage, chatId }) {
               WebkitBoxOrient: "vertical",
               overflow: "hidden",
               textOverflow: "ellipsis",
+                wordBreak: "break-all",
+                  overflowWrap: "anywhere",
             }}
           >
             {lastmessage?(lastmessage?.content):("")}
