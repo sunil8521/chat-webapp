@@ -22,17 +22,21 @@ import { useState, useRef, useReducer } from "react";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
-
+import Snackbar from "@mui/joy/Snackbar";
+import LinearProgress from "@mui/joy/LinearProgress";
 export default function MessageInput({ payload }) {
   const { online_users } = useSelector((state) => state.ONLINEUSER);
   const { ws, peer } = useGlobalVar();
   const { handleSubmit, register, reset, getValues, setValue } = useForm();
   const [fileTransferInProgress, setFileTransferInProgress] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [fileTransferChannel, setFileTransferChannel] = useState(false);
   const fileInputRef = useRef(null);
   const currentFile = useRef(null);
   const [fileName, setFileName] = useState(null);
   const dataChannel = useRef(null);
+  const [open, setOpen] = useState(false);
+
   // to know user is online or not
   const sender = payload.members?.find((id) => id !== payload.senderid._id);
   const is_sender_online = online_users?.includes(sender);
@@ -42,7 +46,113 @@ export default function MessageInput({ payload }) {
 
     if (fileName) {
       if (dataChannel.current && dataChannel.current.readyState === "open") {
-        dataChannel.current.send("Hello! This is a simple text message.");
+        const chunkSize = 16 * 1024;
+        dataChannel.current.bufferedAmountLowThreshold = 64 * 1024;
+
+        const reader = new FileReader();
+        let offset = 0;
+        reader.onabort = (event) => console.log("File reading aborted:", event);
+        reader.onerror = (er) => console.error("Error reading file:", er);
+
+        // ws.send(JSON.stringify({}));  // send message to user like we send file
+
+        // const Tid = toast.loading("File transfer in progress...",);
+        // setOpen(true);
+        reader.onload = async (e) => {
+          const result = e.target?.result;
+          if (
+            result instanceof ArrayBuffer &&
+            dataChannel.current?.readyState === "open"
+          ) {
+            if (
+              dataChannel.current.bufferedAmount >
+              dataChannel.current.bufferedAmountLowThreshold
+            ) {
+              await new Promise((res) => {
+                const handler = () => {
+                  dataChannel.current?.removeEventListener(
+                    "bufferedamountlow",
+                    handler
+                  );
+                  res();
+                };
+                dataChannel.current?.addEventListener(
+                  "bufferedamountlow",
+                  handler
+                );
+              });
+            }
+            const chunk = result;
+            dataChannel.current.send(chunk);
+
+            // console.log("Sent chunk:", chunk.byteLength);
+            offset += chunk.byteLength;
+
+            const progressPercentage = Math.floor(
+              (offset / currentFile.current.size) * 100
+            );
+            toast.loading(
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <span>File sending: {progressPercentage}%</span>
+                <button
+                  onClick={() => {
+                    if (dataChannel.current) {
+                      dataChannel.current.close();
+                      dataChannel.current = null;
+                    }
+                    currentFile.current = null;
+                    fileInputRef.current.value = null;
+                    setFileName(null);
+                    toast.dismiss("file-1");
+                    toast.error("File transfer cancelled");
+                  }}
+                  style={{
+                    background: "#dc3545",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "4px",
+                    padding: "3px 6px",
+                    fontSize: "15px",
+                    cursor: "pointer"
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>,
+              {
+                id: `file-1`,
+                duration: Infinity,
+              }
+            );
+
+            if (offset < currentFile.current.size) {
+              readSlice(offset);
+            } else {
+              currentFile.current = null;
+              fileInputRef.current.value = null;
+              setFileName(null);
+              // setOpen(false);
+          // toast.dismiss(`file-1`);
+
+              console.log("File transfer complete!🚀");
+
+              // toast.success("File transfer complete!", { id: Tid });
+
+              if (dataChannel.current) {
+                dataChannel.current.close();
+                dataChannel.current = null;
+                // setIsUploading(false);
+                // setUploadComplete(true);
+              }
+            }
+          }
+        }; // end onload
+
+        const readSlice = (o) => {
+          const slice = currentFile.current.slice(offset, o + chunkSize);
+          reader.readAsArrayBuffer(slice);
+        };
+        readSlice(0);
       } else {
         console.warn(
           "Data channel is not open yet. State:",
@@ -54,7 +164,7 @@ export default function MessageInput({ payload }) {
     if (!(data.message.trim() == "")) {
       const message = {
         type: "message",
-        payload: { ...payload, content: data.message.trim() },
+        payload: { ...payload, content: data.message.trim(),isMessage:true },
       };
 
       if (ws && ws.readyState === WebSocket.OPEN) {
@@ -67,6 +177,11 @@ export default function MessageInput({ payload }) {
   };
 
   const handleFileChange = async (e) => {
+    if (e.target.files[0].size > 10 * 1024 * 1024) {
+      toast.error("File size exceeds 10MB");
+      return;
+    }
+
     if (!is_sender_online) {
       toast.error("User is offline, can't send file");
       return;
@@ -102,23 +217,27 @@ export default function MessageInput({ payload }) {
       const Tid = toast.loading("Opening file transfer channel...");
       dataChannel.current = peer.createDataChannel("fileTransfer");
       dataChannel.current.binaryType = "arraybuffer";
+
+
       dataChannel.current.onerror = (error) => {
         console.error("Data channel error:", error);
+        toast.error("File transfer failed");
+        fileInputRef.current.value = null;
+        setFileName(null);
+        currentFile.current = null;
+
+        setFileTransferChannel(false);
+
       };
 
       dataChannel.current.onopen = () => {
-        console.log("Data channel opened");
         setFileTransferChannel(false);
         toast.success("File transfer channel opened", {
           id: Tid,
         });
       };
 
-
-
-      
       dataChannel.current.onclose = () => {
-        console.log("Data channel closed");
         toast("File transfer channel closed", {
           icon: "⚠️",
         });
@@ -155,7 +274,6 @@ export default function MessageInput({ payload }) {
           },
         };
         ws.send(JSON.stringify({ message }));
-        console.log("Sending offer to" + sender);
       } catch (er) {
         console.log("Failed to create session description: ", er);
         toast.error("Failed to send file");
@@ -168,9 +286,13 @@ export default function MessageInput({ payload }) {
   const handleRemoveFile = () => {
     setFileName(null);
     if (fileInputRef.current) {
-      fileInputRef.current.value = ""; // reset input
+      fileInputRef.current.value = null; // reset input
     }
   };
+
+
+
+
   return (
     <Box sx={{ px: 2, pb: 3 }}>
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -241,7 +363,8 @@ export default function MessageInput({ payload }) {
 
                   <input
                     type="file"
-                    accept="image/*"
+                    // accept="image/*"
+                    accept="*/*"
                     ref={fileInputRef}
                     style={{ display: "none" }}
                     onChange={handleFileChange}
@@ -267,6 +390,45 @@ export default function MessageInput({ payload }) {
           />
         </FormControl>
       </form>
+
+      <Snackbar
+        sx={{
+          zIndex: 9996,
+        }}
+        open={open}
+        onClose={() => setOpen(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        autoHideDuration={null}
+        variant="outlined"
+      >
+        <Box
+          sx={{ display: "flex", alignItems: "center", gap: 1, minWidth: 280 }}
+        >
+          {/* Progress Bar with % */}
+          <Box sx={{ flexGrow: 1 }}>
+            <Typography level="body-sm" sx={{ mb: 0.5 }}>
+              Uploading... {uploadProgress}%
+            </Typography>
+            <LinearProgress
+              variant="solid"
+              // determinate
+              value={uploadProgress}
+              sx={{ borderRadius: "md", height: 6 }}
+            />
+          </Box>
+
+          {/* Cancel (X) Button */}
+          <Button
+            size="sm"
+            variant="outlined"
+            color="danger"
+            // onClick={cancelUpload}
+            sx={{ minWidth: 32, minHeight: 32, p: 0 }}
+          >
+            ✕
+          </Button>
+        </Box>
+      </Snackbar>
     </Box>
   );
 }

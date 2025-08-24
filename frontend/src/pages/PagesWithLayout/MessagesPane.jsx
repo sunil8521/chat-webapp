@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import Box from "@mui/joy/Box";
 import Sheet from "@mui/joy/Sheet";
 import CircularProgress from "@mui/joy/CircularProgress";
@@ -13,14 +14,18 @@ import { useChatMembersQuery, useChatMessagesQuery } from "../../redux/api";
 import { useGlobalVar } from "../../context/ContextUse";
 import MessageLayouts from "../../components/Layouts/MessageLayout";
 
-
 const MessagesPane = () => {
-  const { ws,peer } = useGlobalVar();
+  const { ws, peer } = useGlobalVar();
   const { user } = useSelector((s) => s.AUTH);
   const { id } = useParams();
-
+  const navigate = useNavigate();
   // Fetch chat members
   const { data, error, isLoading } = useChatMembersQuery(id);
+   useEffect(() => {
+    if (data && data.members == null) {
+      navigate("/home");
+    }
+  }, [data, navigate]);
   const members = data?.members?.participants.map(({ _id }) => _id);
   const sender = data?.members?.participants.find(
     ({ _id }) => _id.toString() !== user._id.toString()
@@ -106,7 +111,7 @@ const MessagesPane = () => {
   useEffect(() => {
     if (!ws) return;
 
-    const handleMessage = async(event) => {
+    const handleMessage = async (event) => {
       const newMessage = JSON.parse(event.data);
       if (
         newMessage.type === "new_message" &&
