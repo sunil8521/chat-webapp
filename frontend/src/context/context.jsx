@@ -21,7 +21,14 @@ export const Global_var_provider = ({ children }) => {
   useEffect(() => {
     if (!user._id) return;
     const peerConnection = new RTCPeerConnection({
-      iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+      iceServers: [{ urls: "stun:stun.l.google.com:19302" },
+
+        {
+          urls: "turn:64.227.129.105:3478",
+          username: "sunil",
+          credential: "yourpassword123",
+        }
+      ],
     });
 
 
