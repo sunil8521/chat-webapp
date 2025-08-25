@@ -186,7 +186,7 @@ const MessagesPane = () => {
     if (endOfMessagesRef.current) {
       endOfMessagesRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [realTimeMessages]);
+  }, [realTime]);
 
   // Cleanup debounce timer on unmount
   useEffect(() => {
