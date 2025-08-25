@@ -117,7 +117,7 @@ const websocketServer = (server) => {
     type: "error",
    message: `Failed to save message, Server error`
   }));
-// }
+}
       }
 if(data.type==="data_message"){
           const { chatid, senderid, content, members,isMessage,isAttachment,attachment } = data.payload;
