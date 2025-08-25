@@ -102,6 +102,22 @@ const websocketServer = (server) => {
         }); // this helps to send message
 
         //TODO- write here save to server
+        try{
+  const newMessage=await messageModel.create({
+    chatid:chatid,
+    senderid:senderid._id,
+    content:content
+  });
+  await chatModel.findByIdAndUpdate(chatid,{
+    lastmessage:newMessage._id
+  },{new:true})
+}catch(dbError){
+  console.error("Database error:", dbError);
+  ws.send(JSON.stringify({
+    type: "error",
+   message: `Failed to save message, Server error`
+  }));
+// }
       }
 if(data.type==="data_message"){
           const { chatid, senderid, content, members,isMessage,isAttachment,attachment } = data.payload;
@@ -152,19 +168,4 @@ const memberSocket = members
 
 export default websocketServer;
 
-// try{
-//   const newMessage=await messageModel.create({
-//     chatid:chatid,
-//     senderid:senderid._id,
-//     content:content
-//   });
-//   await chatModel.findByIdAndUpdate(chatid,{
-//     lastmessage:newMessage._id
-//   },{new:true})
-// }catch(dbError){
-//   console.error("Database error:", dbError);
-//   ws.send(JSON.stringify({
-//     type: "error",
-//    message: `Failed to save message, Server error`
-//   }));
-// }
+
