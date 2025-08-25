@@ -21,10 +21,15 @@ export default function ChatBubble(props) {
   });
 
   // const attachment=false
-  const attachment = {
-    fileUrl:"https://example.com/l.pdf",
-    fileName: "l.pdf",
-    fileSize: "15mb",
+  // Function to format file size
+  const formatFileSize = (bytes) => {
+    if (bytes === 0) return '0 Bytes';
+    
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
   return (
     <Box sx={{ maxWidth: "60%", minWidth: "auto" }}>
@@ -62,9 +67,8 @@ export default function ChatBubble(props) {
                 size="lg"
                 sx={{ borderRadius: "50%" }}
                 component="a"
-                href={attachment.fileUrl}
-                target="_blank"
-                rel="noreferrer"
+                href={props.attachment.fileUrl}
+                download={props.attachment.fileName}
               >
                 <CloudDownloadIcon />
               </IconButton>
@@ -72,13 +76,13 @@ export default function ChatBubble(props) {
                 <Typography
                   sx={{
                     fontSize: "sm",
-                    wordBreak: "break-all",
+                    wordBreak: "break-all", 
                     overflowWrap: "anywhere",
                   }}
                 >
-                  {attachment.fileName}
+                  {props.attachment.fileName}
                 </Typography>
-                <Typography level="body-sm">{attachment.fileSize}</Typography>
+                <Typography level="body-sm">{formatFileSize(props.attachment.fileSize)}</Typography>
               </div>
             </Stack>
           </Sheet>

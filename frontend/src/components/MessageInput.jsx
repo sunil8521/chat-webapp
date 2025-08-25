@@ -145,6 +145,9 @@ export default function MessageInput({ payload }) {
                 },
               };
               dataChannel.current.send(JSON.stringify({ message }));
+
+
+
               if (dataChannel.current) {
                 dataChannel.current.close();
                 dataChannel.current = null;

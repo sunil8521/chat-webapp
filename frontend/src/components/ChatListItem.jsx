@@ -69,7 +69,10 @@ export default function ChatListItem({ participants, lastmessage, chatId }) {
                   overflowWrap: "anywhere",
             }}
           >
-            {lastmessage?(lastmessage?.content):("")}
+            {lastmessage?(lastmessage?.content=="file"?("📎 File"):(lastmessage.content)):("")}
+            
+
+
           </Typography>
 
 

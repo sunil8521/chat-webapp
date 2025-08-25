@@ -103,6 +103,42 @@ const websocketServer = (server) => {
 
         //TODO- write here save to server
       }
+if(data.type==="data_message"){
+          const { chatid, senderid, content, members,isMessage,isAttachment,attachment } = data.payload;
+const memberSocket = members
+          .map((id) => users.get(id))
+          .filter((ws) => ws !== undefined);
+
+        memberSocket.forEach((ws) => {
+          ws.send(
+            JSON.stringify({
+              type: "last_message",
+              chatid: chatid,
+              content: "file",
+              updatedAt: Date.now(),
+            })
+          );
+        }); // this will send last message
+
+        memberSocket.forEach((ws) => {
+          ws.send(
+            JSON.stringify({
+              type: "new_message",
+              payload: {
+                senderid,
+                chatid: chatid,
+                content: content,
+                createdAt: Date.now(),
+                isMessage,
+                isAttachment,
+                attachment
+              },
+            })
+          );
+        }); // this helps to send message  
+}
+
+
     });
 
     ws.on("close", () => {
