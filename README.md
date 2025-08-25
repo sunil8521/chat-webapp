@@ -12,6 +12,8 @@ A modern, real-time chat application built with WebSocket technology, featuring 
 - **Message history** with pagination
 - **Online status** indicators
 - **Secure password management**
+- **WebRTC-based file transfer (temporary, non-persistent)**  
+  _Files sent via WebRTC are not stored on the server; they will vanish if the page is reloaded._
 
 ## 🚀 Quick Start
 
@@ -191,25 +193,4 @@ VITE_APP_NAME=ChatApp
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🐛 Known Issues
-
-- File upload size limit: 5MB
-- WebSocket reconnection handling in progress
-- Mobile optimization ongoing
-
-## 🔮 Future Enhancements
-
-- [ ] Voice messages
-- [ ] File sharing
-- [ ] Message reactions
-- [ ] Dark/Light theme toggle
-- [ ] Push notifications
-- [ ] Group chat admin features
-
-## 📞 Support
-
-For support or questions, please open an issue on GitHub or contact the development team.
