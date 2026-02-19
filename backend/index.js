@@ -24,16 +24,6 @@ imageUploader.config({
   api_secret: process.env.API_SECRET,
   secure: true,
 });
-app.use(
-  cors({
-    origin: [
-      "http://localhost:5173",
-      "https://goss-app.netlify.app",
-      "http://192.168.29.196:5173",
-    ],
-    credentials: true,
-  })
-); // do not use when prodcution
 
 async function Database() {
   try {

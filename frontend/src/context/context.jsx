@@ -21,17 +21,16 @@ export const Global_var_provider = ({ children }) => {
   useEffect(() => {
     if (!user._id) return;
     const peerConnection = new RTCPeerConnection({
-      iceServers: [{ urls: "stun:stun.l.google.com:19302" },
+      iceServers: [
+        { urls: "stun:stun.l.google.com:19302" },
 
         {
-          urls: "turn:64.227.129.105:3478",
+          urls: "turn:139.59.25.179:3478",
           username: "sunil",
-          credential: "yourpassword123",
-        }
+          credential: "sunil8521",
+        },
       ],
     });
-
-
 
     let socket = new WebSocket(import.meta.env.VITE_WSURL, [user._id]);
 
@@ -61,7 +60,7 @@ export const Global_var_provider = ({ children }) => {
             socket.send(
               JSON.stringify({
                 message,
-              })
+              }),
             );
           }
         };
@@ -87,7 +86,7 @@ export const Global_var_provider = ({ children }) => {
       } else if (data.type === "answer") {
         // console.log("answer");
         await peerConnection.setRemoteDescription(
-          new RTCSessionDescription(data.payload.webRtcData)
+          new RTCSessionDescription(data.payload.webRtcData),
         );
         iceQueue.current.forEach(async (candidate) => {
           await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
@@ -105,14 +104,12 @@ export const Global_var_provider = ({ children }) => {
           addRealTimeMessage({
             chatId: data.payload.chatid,
             message: data.payload,
-          })
+          }),
         );
       }
     };
 
-
-
-        peerConnection.ondatachannel = (event) => {
+    peerConnection.ondatachannel = (event) => {
       const receiveChannel = event.channel;
       let offset = 0;
       let progressPercentage = 0;
@@ -121,17 +118,20 @@ export const Global_var_provider = ({ children }) => {
       let downloadLink;
       receiveChannel.onmessage = async (event) => {
         if (typeof event.data === "string") {
-          const { message:data } = JSON.parse(event.data);
-          const message={
-            type:"data_message",
-            payload:{...data.payload,attachment:{
-              fileName:fileDetails.current.name,
-              fileSize:fileDetails.current.size,
-              fileType:fileDetails.current.type,
-              lastModified:fileDetails.current.lastModified,
-              fileUrl:downloadLink
-            }}
-          }
+          const { message: data } = JSON.parse(event.data);
+          const message = {
+            type: "data_message",
+            payload: {
+              ...data.payload,
+              attachment: {
+                fileName: fileDetails.current.name,
+                fileSize: fileDetails.current.size,
+                fileType: fileDetails.current.type,
+                lastModified: fileDetails.current.lastModified,
+                fileUrl: downloadLink,
+              },
+            },
+          };
           setTimeout(() => {
             socket.send(JSON.stringify({ message }));
           }, 1500);
@@ -152,7 +152,7 @@ export const Global_var_provider = ({ children }) => {
 
         // show progress bar
         progressPercentage = Math.floor(
-          (offset / fileDetails.current.size) * 100
+          (offset / fileDetails.current.size) * 100,
         );
         toast.loading(`File receiving: ${progressPercentage}%`, {
           id: `file-progress-${fileDetails.current.name}`,
@@ -169,7 +169,7 @@ export const Global_var_provider = ({ children }) => {
 
         if (reciveSizeRef.current == fileDetails.current.size) {
           const received = new Blob(reciveArry.current);
-           downloadLink = URL.createObjectURL(received);
+          downloadLink = URL.createObjectURL(received);
 
           // console.log("File received:", downloadLink);
 
@@ -206,11 +206,6 @@ export const Global_var_provider = ({ children }) => {
     socket.onclose = () => {
       console.log("WebSocket connection closed");
     };
-
-
-
-
-
 
     setWs(socket);
     setPeer(peerConnection);
