@@ -25,9 +25,9 @@ export const Global_var_provider = ({ children }) => {
         { urls: "stun:stun.l.google.com:19302" },
 
         {
-          urls: "turn:139.59.25.179:3478",
-          username: "sunil",
-          credential: "sunil8521",
+          urls: import.meta.env.VITE_TURNURL,
+          username: import.meta.env.VITE_TURNUSERNAME,
+          credential: import.meta.env.VITE_TURNPASSWORD,
         },
       ],
     });
